@@ -1,0 +1,5 @@
+<network-security-config>
+    <base-config>
+        <certificateTransparency enabled="true" />
+    </base-config>
+</network-security-config>

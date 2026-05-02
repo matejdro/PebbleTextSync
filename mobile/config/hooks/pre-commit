@@ -1,0 +1,4 @@
+#!/bin/bash
+set -e
+cd mobile
+./gradlew -q --parallel -Pprecommit=true :buildSrc:detekt detekt reportMerge --continue

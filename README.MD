@@ -1,0 +1,6 @@
+WIP
+
+# Contributing
+
+See [CONTRIBUTING](CONTRIBUTING.MD)
+

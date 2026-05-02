@@ -1,0 +1,176 @@
+import com.slack.keeper.optInToKeeper
+
+plugins {
+   androidAppModule
+   compose
+   navigation
+   serialization
+   showkase
+   id("com.slack.keeper")
+   id("androidx.baselineprofile")
+}
+
+android {
+   namespace = "com.matejdro.pebbletextsync"
+
+   buildFeatures {
+      buildConfig = true
+   }
+
+   defaultConfig {
+      applicationId = "com.matejdro.pebbletextsync"
+      targetSdk = 33
+      versionCode = 1
+      versionName = "1.0.0"
+
+      testInstrumentationRunner = "com.matejdro.pebbletextsync.instrumentation.TestRunner"
+      testInstrumentationRunnerArguments += "clearPackageData" to "true"
+      // Needed to enable test coverage
+      testInstrumentationRunnerArguments += "useTestStorageService" to "true"
+   }
+
+   testOptions {
+      execution = "ANDROIDX_TEST_ORCHESTRATOR"
+   }
+
+   if (providers.gradleProperty("testAppWithProguard").isPresent) {
+      testBuildType = "proguardedDebug"
+   }
+
+   signingConfigs {
+      getByName("debug") {
+         // SHA1: B5:36:F6:27:81:AA:BB:26:04:B9:B3:91:1D:CA:6A:CA:74:26:0C:A6
+         // SHA256: 28:E8:53:AE:D1:D5:7A:65:44:38:AB:C0:85:99:75:23:63:9B:CA:B8:A9:AC:8B:DD:06:FF:B2:77:6A:C2:AC:FF
+
+         storeFile = File(rootDir, "keys/debug.jks")
+         storePassword = "android"
+         keyAlias = "androiddebugkey"
+         keyPassword = "android"
+      }
+
+      create("release") {
+         // SHA1: 5E:AE:58:CA:DE:21:52:FD:7C:3D:B3:98:F4:63:84:26:05:AF:B0:39
+         // SHA256: 56:1F:15:1B:F5:74:FD:14:7A:44:95:13:DF:4B:33:5D:B9:63:B9:0E:9D:C6:D0:87:83:D1:FF:53:38:B1:40:A2
+
+         storeFile = File(rootDir, "keys/release.jks")
+         storePassword = System.getenv("RELEASE_KEYSTORE_PASSWORD")
+         keyAlias = "app"
+         keyPassword = System.getenv("RELEASE_KEYSTORE_PASSWORD")
+      }
+   }
+
+   buildTypes {
+      getByName("debug") {
+         // TODO uncomment when above signing config becomes valid
+         // signingConfig = signingConfigs.getByName("debug")
+      }
+
+      create("proguardedDebug") {
+         isMinifyEnabled = true
+         isShrinkResources = true
+
+         proguardFiles(
+            getDefaultProguardFile("proguard-android-optimize.txt"),
+            "proguard-rules.pro",
+         )
+
+         testProguardFiles(
+            getDefaultProguardFile("proguard-android-optimize.txt"),
+            "proguard-rules.pro",
+            "proguard-rules-test.pro"
+         )
+
+         matchingFallbacks += "debug"
+
+         signingConfig = signingConfigs.getByName("debug")
+      }
+
+      create("benchmark") {
+         isDebuggable = true
+         initWith(buildTypes.getByName("release"))
+         signingConfig = signingConfigs.getByName("debug")
+         matchingFallbacks += listOf("release")
+      }
+
+      getByName("release") {
+         isMinifyEnabled = true
+         isShrinkResources = true
+
+         proguardFiles(
+            getDefaultProguardFile("proguard-android-optimize.txt"),
+            "proguard-rules.pro"
+         )
+
+         signingConfig = signingConfigs.getByName("release")
+      }
+   }
+}
+
+androidComponents {
+   beforeVariants { builder ->
+      if (builder.name.contains("proguardedDebug")) {
+         builder.optInToKeeper()
+      }
+   }
+}
+
+keeper {
+   automaticR8RepoManagement = false
+}
+
+custom {
+   enableEmulatorTests.set(true)
+}
+
+dependencyAnalysis {
+   issues {
+      onUnusedDependencies {
+         // Needed to declare to force newer version to avoid mismatched dependencies error
+         exclude("androidx.concurrent:concurrent-futures")
+      }
+   }
+}
+
+dependencies {
+   implementation(projects.common)
+   implementation(projects.commonNavigation)
+   implementation(projects.commonRetrofit)
+   implementation(projects.commonRetrofit.android)
+   implementation(projects.commonCompose)
+
+   implementation(libs.androidx.activity.compose)
+   implementation(libs.androidx.core)
+   implementation(libs.androidx.core.splashscreen)
+   implementation(libs.androidx.lifecycle.runtime)
+   implementation(libs.androidx.lifecycle.viewModel)
+   implementation(libs.androidx.lifecycle.viewModel.compose)
+   implementation(libs.androidx.navigation3)
+   implementation(libs.androidx.navigation3)
+   implementation(libs.coil)
+   implementation(libs.dispatch)
+   implementation(libs.logcat)
+   implementation(libs.kotlin.coroutines)
+   implementation(libs.kotlin.serialization.json)
+   implementation(libs.kotlinova.core)
+   implementation(libs.kotlinova.navigation)
+   implementation(libs.kotlinova.navigation.deeplink)
+   implementation(libs.kotlinova.navigation.navigation3)
+
+   implementation(libs.androidx.datastore)
+   implementation(libs.androidx.datastore.preferences)
+
+   debugImplementation(libs.whatTheStack)
+
+   // We don't need espresso directly, but we need to force a higher version to work on the Android 16 QPR2
+   implementation(libs.androidx.concurrent.futures)
+   androidTestImplementation(libs.androidx.test.junitRules)
+   androidTestImplementation(libs.androidx.test.runner)
+   androidTestImplementation(libs.junit4)
+   androidTestImplementation(libs.kotlinova.retrofit.test)
+   androidTestImplementation(libs.okhttp)
+   androidTestImplementation(libs.okhttp.mockWebServer)
+   androidTestUtil(libs.androidx.test.orchestrator)
+   androidTestUtil(libs.androidx.test.services)
+
+   keeperR8(libs.androidx.r8)
+}
