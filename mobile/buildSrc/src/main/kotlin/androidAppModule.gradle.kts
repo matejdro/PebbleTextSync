@@ -63,10 +63,6 @@ android {
    }
 }
 
-dependencies {
-   androidTestImplementation(libs.androidx.test.runner)
-}
-
 setupTooManyKotlinFilesTaskForApp()
 
 abstract class GitCommandValueSource : ValueSource<String, ValueSourceParameters.None> {

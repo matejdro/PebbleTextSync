@@ -1,12 +1,9 @@
-import com.slack.keeper.optInToKeeper
-
 plugins {
    androidAppModule
    compose
    navigation
    serialization
    showkase
-   id("com.slack.keeper")
    id("androidx.baselineprofile")
 }
 
@@ -85,13 +82,6 @@ android {
          signingConfig = signingConfigs.getByName("debug")
       }
 
-      create("benchmark") {
-         isDebuggable = true
-         initWith(buildTypes.getByName("release"))
-         signingConfig = signingConfigs.getByName("debug")
-         matchingFallbacks += listOf("release")
-      }
-
       getByName("release") {
          isMinifyEnabled = true
          isShrinkResources = true
@@ -104,18 +94,6 @@ android {
          signingConfig = signingConfigs.getByName("release")
       }
    }
-}
-
-androidComponents {
-   beforeVariants { builder ->
-      if (builder.name.contains("proguardedDebug")) {
-         builder.optInToKeeper()
-      }
-   }
-}
-
-keeper {
-   automaticR8RepoManagement = false
 }
 
 custom {
@@ -135,9 +113,9 @@ dependencies {
    implementation(projects.home.ui)
    implementation(projects.common)
    implementation(projects.commonNavigation)
-   implementation(projects.commonRetrofit)
-   implementation(projects.commonRetrofit.android)
    implementation(projects.commonCompose)
+   implementation(projects.home.api)
+   implementation(projects.home.ui)
    implementation(projects.navigationImpl)
 
    implementation(libs.androidx.activity.compose)
@@ -152,7 +130,6 @@ dependencies {
    implementation(libs.dispatch)
    implementation(libs.logcat)
    implementation(libs.kotlin.coroutines)
-   implementation(libs.kotlin.serialization.json)
    implementation(libs.kotlinova.core)
    implementation(libs.kotlinova.navigation)
    implementation(libs.kotlinova.navigation.deeplink)
@@ -162,17 +139,4 @@ dependencies {
    implementation(libs.androidx.datastore.preferences)
 
    debugImplementation(libs.whatTheStack)
-
-   // We don't need espresso directly, but we need to force a higher version to work on the Android 16 QPR2
-   implementation(libs.androidx.concurrent.futures)
-   androidTestImplementation(libs.androidx.test.junitRules)
-   androidTestImplementation(libs.androidx.test.runner)
-   androidTestImplementation(libs.junit4)
-   androidTestImplementation(libs.kotlinova.retrofit.test)
-   androidTestImplementation(libs.okhttp)
-   androidTestImplementation(libs.okhttp.mockWebServer)
-   androidTestUtil(libs.androidx.test.orchestrator)
-   androidTestUtil(libs.androidx.test.services)
-
-   keeperR8(libs.androidx.r8)
 }

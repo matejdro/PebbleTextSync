@@ -74,6 +74,15 @@ dependencyAnalysis {
       bundle("sqlDelight") {
          includeGroup("app.cash.sqldelight")
       }
+
+      bundle("navigation3") {
+         includeGroup("androidx.navigation3")
+      }
+
+      bundle("windowManagement") {
+         includeGroup("androidx.window")
+         includeDependency("com.google.accompanist:accompanist-adaptive")
+      }
    }
 }
 

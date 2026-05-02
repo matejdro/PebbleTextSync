@@ -33,7 +33,6 @@ dependencies {
    implementation(libs.androidx.benchmark.baselineProfilePlugin)
    implementation(libs.detekt.plugin)
    implementation(libs.dependencyAnalysis)
-   implementation(libs.keeperPlugin)
    implementation(libs.kotlin.plugin)
    implementation(libs.kotlin.plugin.compose)
    implementation(libs.kotlin.plugin.serialization)
