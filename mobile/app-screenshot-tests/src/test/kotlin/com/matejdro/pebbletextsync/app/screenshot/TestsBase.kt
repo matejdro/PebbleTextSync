@@ -6,17 +6,21 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalInspectionMode
 import app.cash.paparazzi.DeviceConfig.Companion.PIXEL_5
 import app.cash.paparazzi.Paparazzi
+import com.airbnb.android.showkase.models.Showkase
 import com.airbnb.android.showkase.models.ShowkaseBrowserComponent
 import com.android.ide.common.rendering.api.SessionParams
 import com.android.resources.NightMode
 import com.google.testing.junit.testparameterinjector.TestParameterInjector
 import com.google.testing.junit.testparameterinjector.TestParameterValuesProvider
+import com.matejdro.pebbletextsync.showkase.getMetadata
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.runner.RunWith
 
 @Suppress("JUnitMalformedDeclaration")
 @RunWith(TestParameterInjector::class)
+@Ignore("Base test class")
 open class TestsBase {
    @get:Rule
    val paparazzi = Paparazzi(
@@ -29,25 +33,22 @@ open class TestsBase {
 
    object PreviewProvider : TestParameterValuesProvider() {
       override fun provideValues(context: Context): List<*> {
-         //         TODO uncomment this when you have at least one preview marked with @ShowkaseComposable
-         // val splitIndex = context.getOtherAnnotation(SplitIndex::class.java).index
-         // val totalSplits = System.getProperty("maxParallelForks")?.toInt() ?: error("Missing maxParallelForks property")
-         //
-         // val allComponents = Showkase.getMetadata().componentList
-         // val perSplit = allComponents.size / totalSplits
-         //
-         // val start = splitIndex * perSplit
-         // val end = if (splitIndex == totalSplits - 1) {
-         //    allComponents.size
-         // } else {
-         //    start + perSplit
-         // }
-         //
-         // val components = allComponents
-         //    .subList(start, end)
-         //    .map { TestKey(it) }
+         val splitIndex = context.getOtherAnnotation(SplitIndex::class.java).index
+         val totalSplits = System.getProperty("maxParallelForks")?.toInt() ?: error("Missing maxParallelForks property")
 
-         val components = emptyList<TestKey>()
+         val allComponents = Showkase.getMetadata().componentList
+         val perSplit = allComponents.size / totalSplits
+
+         val start = splitIndex * perSplit
+         val end = if (splitIndex == totalSplits - 1) {
+            allComponents.size
+         } else {
+            start + perSplit
+         }
+
+         val components = allComponents
+            .subList(start, end)
+            .map { TestKey(it) }
 
          for (i in components.indices) {
             for (j in components.indices) {
