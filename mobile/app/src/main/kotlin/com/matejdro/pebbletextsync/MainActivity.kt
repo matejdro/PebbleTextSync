@@ -21,11 +21,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation3.runtime.NavEntryDecorator
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
+import com.matejdro.pebbletextsync.navigation.scenes.ListDetailScene
+import com.matejdro.pebbletextsync.navigation.scenes.rememberListDetailSceneStrategy
+import com.matejdro.pebbletextsync.navigation.scenes.rememberTabListSceneDecoratorStrategy
 import com.matejdro.pebbletextsync.ui.theme.TextSyncTheme
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import logcat.logcat
 import si.inova.kotlinova.compose.result.LocalResultPassingStore
 import si.inova.kotlinova.compose.result.ResultPassingStore
 import si.inova.kotlinova.compose.time.ComposeAndroidDateTimeFormatter
@@ -45,6 +48,7 @@ class MainActivity : ComponentActivity() {
    private lateinit var navigationContext: NavigationContext
    private lateinit var dateFormatter: AndroidDateTimeFormatter
    private lateinit var mainViewModelFactory: MainViewModel.Factory
+   private lateinit var listDetailSceneFactory: ListDetailScene.Factory
 
    private val viewModel by viewModels<MainViewModel>() { ViewModelFactory() }
    private var initComplete = false
@@ -57,6 +61,7 @@ class MainActivity : ComponentActivity() {
       navigationContext = appGraph.getNavigationContext()
       dateFormatter = appGraph.getDateFormatter()
       mainViewModelFactory = appGraph.getMainViewModelFactory()
+      listDetailSceneFactory = appGraph.getListDetailSceneFactory()
 
       super.onCreate(savedInstanceState)
       enableEdgeToEdge()
@@ -69,7 +74,7 @@ class MainActivity : ComponentActivity() {
 
    private fun beginInitialisation(startup: Boolean) {
       lifecycleScope.launch {
-         val initialHistory: List<ScreenKey> = listOf(viewModel.startingScreen.filterNotNull().first())
+         val initialHistory: List<ScreenKey> = viewModel.startingScreens.first { it.isNotEmpty() }
 
          val deepLinkTarget = if (startup) {
             intent?.data?.let { mainDeepLinkHandler.handleDeepLink(it, startup = true) }
@@ -115,8 +120,9 @@ class MainActivity : ComponentActivity() {
                            }
                         }
                      )
-
-                  )
+                  ),
+                  sceneStrategies = listOf(rememberListDetailSceneStrategy(listDetailSceneFactory)),
+                  sceneDecoratorStrategies = listOf(rememberTabListSceneDecoratorStrategy())
                )
 
                LogCurrentScreen(backstack)
@@ -142,11 +148,9 @@ private fun LogCurrentScreen(backstack: Backstack) {
          .map { list -> list.lastOrNull() }
    }
 
-   @Suppress("UnusedVariable") // TODO Remove this suppression when the variable is used
    val newTopKey = topScreenFlow.collectAsStateWithLifecycle(null).value
 
    SideEffect {
-      // TODO log new top key here to the crash reporting service, such as Firebase
-      //  (and ideally set a Key) to make debugging crashes / error reports easier
+      logcat("MainActivity") { "Switched to ${newTopKey ?: "null"}" }
    }
 }

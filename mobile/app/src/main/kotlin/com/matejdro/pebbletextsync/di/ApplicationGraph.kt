@@ -2,6 +2,7 @@ package com.matejdro.pebbletextsync.di
 
 import android.app.Application
 import com.matejdro.pebbletextsync.MainViewModel
+import com.matejdro.pebbletextsync.navigation.scenes.ListDetailScene
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.DependencyGraph
 import dev.zacsweers.metro.Provides
@@ -32,4 +33,5 @@ interface ApplicationGraph {
    fun getNavigationContext(): NavigationContext
    fun getDateFormatter(): AndroidDateTimeFormatter
    fun getMainViewModelFactory(): MainViewModel.Factory
+   fun getListDetailSceneFactory(): ListDetailScene.Factory
 }

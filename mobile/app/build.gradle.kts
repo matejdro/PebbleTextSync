@@ -132,11 +132,13 @@ dependencyAnalysis {
 }
 
 dependencies {
+   implementation(projects.home.ui)
    implementation(projects.common)
    implementation(projects.commonNavigation)
    implementation(projects.commonRetrofit)
    implementation(projects.commonRetrofit.android)
    implementation(projects.commonCompose)
+   implementation(projects.navigationImpl)
 
    implementation(libs.androidx.activity.compose)
    implementation(libs.androidx.core)
