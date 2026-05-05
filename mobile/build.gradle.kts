@@ -83,6 +83,14 @@ dependencyAnalysis {
          includeGroup("androidx.window")
          includeDependency("com.google.accompanist:accompanist-adaptive")
       }
+
+      bundle("kermit") {
+         includeGroup("co.touchlab")
+      }
+
+      bundle("tinylog") {
+         includeGroup("org.tinylog")
+      }
    }
 }
 

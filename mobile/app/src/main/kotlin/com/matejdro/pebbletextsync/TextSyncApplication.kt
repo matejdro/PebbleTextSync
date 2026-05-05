@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.StrictMode
 import android.os.StrictMode.VmPolicy
 import android.os.strictmode.Violation
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composer
 import androidx.compose.runtime.ExperimentalComposeRuntimeApi
 import androidx.compose.runtime.tooling.ComposeStackTraceMode
@@ -14,8 +15,10 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
 import coil3.ImageLoader
 import coil3.SingletonImageLoader
+import com.matejdro.pebble.common.crashreport.CrashWindowThemeProvider
 import com.matejdro.pebbletextsync.di.ApplicationGraph
 import com.matejdro.pebbletextsync.di.MainApplicationGraph
+import com.matejdro.pebbletextsync.ui.theme.TextSyncTheme
 import dev.zacsweers.metro.createGraphFactory
 import dispatch.core.DefaultDispatcherProvider
 import dispatch.core.defaultDispatcher
@@ -23,7 +26,7 @@ import logcat.AndroidLogcatLogger
 import logcat.LogPriority
 import si.inova.kotlinova.core.dispatchers.AccessCallbackDispatcherProvider
 
-open class TextSyncApplication : Application() {
+open class TextSyncApplication : Application(), CrashWindowThemeProvider {
    open val applicationGraph: ApplicationGraph by lazy {
       createGraphFactory<MainApplicationGraph.Factory>().create(this)
    }
@@ -177,6 +180,11 @@ open class TextSyncApplication : Application() {
       return activityManager.runningAppProcesses?.any {
          it.pid == myPid && packageName == it.processName
       } == true
+   }
+
+   @Composable
+   override fun ApplyTheme(content: @Composable (() -> Unit)) {
+      TextSyncTheme(content = content)
    }
 }
 

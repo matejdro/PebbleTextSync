@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">TextSync for Pebble</string>
+    <string name="github_link" translatable="false">https://github.com/matejdro/PebbleTextSync/issues/new</string>
 </resources>

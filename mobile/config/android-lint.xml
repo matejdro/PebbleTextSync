@@ -30,4 +30,7 @@ Ignore unknown issue id to allow us to configure issues in this file  that
     <!-- We regularly update dependencies at our own pace -->
     <issue id="AndroidGradlePluginVersion" severity="ignore" />
     <issue id="GradleDependency" severity="ignore" />
+
+    <!-- We don't even have internet permission. It's not an issue -->
+    <issue id="DefaultCleartextTraffic" severity="ignore" />
 </lint>

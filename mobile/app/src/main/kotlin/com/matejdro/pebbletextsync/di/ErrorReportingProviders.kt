@@ -1,11 +1,14 @@
 package com.matejdro.pebbletextsync.di
 
+import android.content.Context
+import com.matejdro.pebble.common.crashreport.CrashReportService
+import com.matejdro.pebble.common.logging.TinyLogLoggingThread
 import com.matejdro.pebbletextsync.BuildConfig
 import com.matejdro.pebbletextsync.common.exceptions.CrashOnDebugException
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesTo
 import dev.zacsweers.metro.Provides
-import logcat.logcat
+import org.tinylog.Level
 import si.inova.kotlinova.core.exceptions.UnknownCauseException
 import si.inova.kotlinova.core.outcome.CauseException
 import si.inova.kotlinova.core.reporting.ErrorReporter
@@ -14,7 +17,7 @@ import si.inova.kotlinova.core.reporting.ErrorReporter
 @ContributesTo(AppScope::class)
 interface ErrorReportingProviders {
    @Provides
-   fun provideErrorReporter(): ErrorReporter {
+   fun provideErrorReporter(tinyLogLoggingThread: TinyLogLoggingThread, context: Context): ErrorReporter {
       return object : ErrorReporter {
          override fun report(throwable: Throwable) {
             if (throwable !is CauseException) {
@@ -23,9 +26,9 @@ interface ErrorReportingProviders {
             }
 
             if (throwable.shouldReport) {
-               logcat { "Reporting $throwable to Firebase" }
-               // TODO Substitute with error reporter here (Firebase?)
                throwable.printStackTrace()
+               tinyLogLoggingThread.log(1, "ErrorReporter", Level.ERROR, null, throwable)
+               CrashReportService.showCrashNotification(throwable.stackTraceToString(), context)
             } else if (BuildConfig.DEBUG) {
                if (throwable is CrashOnDebugException) {
                   throw throwable

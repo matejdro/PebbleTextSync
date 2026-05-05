@@ -2,9 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.INTERNET" />
-
-    <!-- Required for WhatTheStack -->
+    <!-- Required for crash reporting -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
@@ -45,6 +43,16 @@
                 android:name="android.window.PROPERTY_SUPPORTS_MULTI_INSTANCE_SYSTEM_UI"
                 android:value="true" />
         </activity>
+
+        <provider
+            android:name="com.matejdro.pebble.common.logging.LogFileProvider"
+            android:authorities="com.matejdro.pebbletextsync.logs"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/logging_file_paths" />
+        </provider>
     </application>
 
 </manifest>

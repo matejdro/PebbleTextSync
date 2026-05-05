@@ -116,6 +116,8 @@ dependencies {
    implementation(projects.commonCompose)
    implementation(projects.home.api)
    implementation(projects.home.ui)
+   implementation(projects.logging.crashreport)
+   implementation(projects.logging.data)
    implementation(projects.navigationImpl)
 
    implementation(libs.androidx.activity.compose)
@@ -129,14 +131,14 @@ dependencies {
    implementation(libs.coil)
    implementation(libs.dispatch)
    implementation(libs.logcat)
+   implementation(libs.kermit)
    implementation(libs.kotlin.coroutines)
    implementation(libs.kotlinova.core)
    implementation(libs.kotlinova.navigation)
    implementation(libs.kotlinova.navigation.deeplink)
    implementation(libs.kotlinova.navigation.navigation3)
+   implementation(libs.tinylog.api)
 
    implementation(libs.androidx.datastore)
    implementation(libs.androidx.datastore.preferences)
-
-   debugImplementation(libs.whatTheStack)
 }

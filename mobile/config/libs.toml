@@ -23,6 +23,7 @@ androidx-test-orchestrator = "1.6.1"
 androidx-test-runner = "1.7.0"
 androidx-test-services = "1.6.0"
 androidx-test-uiautomator = "2.3.0"
+androidx-startup = "1.2.0"
 coil = "3.4.0"
 dependencyAnalysis = "3.7.0"
 desugarJdkLibs = "2.1.5"
@@ -38,6 +39,7 @@ kotlin = "2.3.20"
 kotlin-coroutines = "1.10.2"
 kotlin-serializationRuntime = "1.11.0"
 kotlinova = "4.0.3"
+kermit = "2.1.0"
 ksp = "2.3.6"
 logcat = "0.4"
 metro = "1.0.0-RC1"
@@ -48,10 +50,10 @@ orgJson = "20251224"
 paparazzi = "2.0.0-alpha04"
 rebugger = "1.0.1"
 showkase = "1.0.5"
+tinylog = "2.7.0"
 turbine = "1.2.1"
 unmock-androidJar = "16-robolectric-13921718"
 unmock-plugin = "0.9.0"
-whatTheStack = "1.0.0-alpha08"
 
 [libraries]
 accompanist-adaptive = { module = "com.google.accompanist:accompanist-adaptive", version.ref = "accompanist" }
@@ -88,6 +90,7 @@ androidx-perfetto = { module = "androidx.tracing:tracing-perfetto", version.ref 
 androidx-perfetto-binary = { module = "androidx.tracing:tracing-perfetto-binary", version.ref = "androidx-perfetto" }
 androidx-profileInstaller = { module = "androidx.profileinstaller:profileinstaller", version.ref = "androidx-profileInstaller" }
 androidx-r8 = { module = "com.android.tools:r8", version.ref = "androidx-r8" }
+androidx-startup = { module = "androidx.startup:startup-runtime", version.ref = "androidx-startup" }
 androidx-test-core = { module = "androidx.test:core", version.ref = "androidx-test-core" }
 androidx-test-junitRules = { module = "androidx.test.ext:junit", version.ref = "androidx-test-ext" }
 androidx-test-orchestrator = { module = "androidx.test:orchestrator", version.ref = "androidx-test-orchestrator" }
@@ -105,6 +108,7 @@ detekt-plugin = { module = "dev.detekt:detekt-gradle-plugin", version.ref = "det
 detekt-test = { module = "dev.detekt:detekt-test", version.ref = "detekt" }
 dispatch = { module = "com.rickbusarow.dispatch:dispatch-core", version.ref = "dispatch" }
 dispatch-test = { module = "com.rickbusarow.dispatch:dispatch-test", version.ref = "dispatch" }
+kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 # @keep This particular dependency is not used directly. We declare it here to enable dependency updates.
 # But only the version nubmer is used in the Gradle configuration
 # noinspection UnusedVersionCatalogEntry
@@ -143,10 +147,11 @@ orgJson = { module = "org.json:json", version.ref = "orgJson" }
 rebugger = { module = "io.github.theapache64:rebugger", version.ref = "rebugger" }
 showkase = { module = "com.airbnb.android:showkase", version.ref = "showkase" }
 showkase-processor = { module = "com.airbnb.android:showkase-processor", version.ref = "showkase" }
+tinylog-api = { module = "org.tinylog:tinylog-api-kotlin", version.ref = "tinylog" }
+tinylog-impl = { module = "org.tinylog:tinylog-impl", version.ref = "tinylog" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 unmock-androidJar = { module = "org.robolectric:android-all", version.ref = "unmock-androidJar" }
 unmock-plugin = { module = "com.github.bjoernq:unmockplugin", version.ref = "unmock-plugin" }
-whatTheStack = { module = "com.github.fvito:WhatTheStack", version.ref = "whatTheStack" }
 
 
 [plugins]
