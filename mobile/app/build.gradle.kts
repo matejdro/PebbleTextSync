@@ -4,6 +4,7 @@ plugins {
    navigation
    serialization
    showkase
+   sqldelight
    id("androidx.baselineprofile")
 }
 
@@ -109,11 +110,30 @@ dependencyAnalysis {
    }
 }
 
+sqldelight {
+   databases {
+      create("Database") {
+         packageName.set("com.matejdro.pebbletextsync")
+         schemaOutputDirectory.set(file("src/main/sqldelight/databases"))
+
+         dependency(project(projects.files.data.path))
+      }
+   }
+}
+
+afterEvaluate {
+   tasks.named("verifyDebugDatabaseMigration") {
+      // Workaround for the https://github.com/cashapp/sqldelight/issues/5115
+      mustRunAfter("generateDebugDatabaseSchema")
+   }
+}
+
 dependencies {
    implementation(projects.home.ui)
    implementation(projects.common)
    implementation(projects.commonNavigation)
    implementation(projects.commonCompose)
+   implementation(projects.files.data)
    implementation(projects.home.api)
    implementation(projects.home.ui)
    implementation(projects.tools.api)
@@ -140,6 +160,7 @@ dependencies {
    implementation(libs.kotlinova.navigation)
    implementation(libs.kotlinova.navigation.deeplink)
    implementation(libs.kotlinova.navigation.navigation3)
+   implementation(libs.sqldelight.android)
    implementation(libs.tinylog.api)
 
    implementation(libs.androidx.datastore)

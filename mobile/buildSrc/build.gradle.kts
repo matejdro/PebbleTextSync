@@ -40,6 +40,7 @@ dependencies {
    implementation(libs.metro.plugin)
    implementation(libs.moduleGraphAssert)
    implementation(libs.orgJson)
+   implementation(libs.sqldelight.gradle)
    implementation(libs.ksp)
    implementation(libs.unmock.plugin)
 

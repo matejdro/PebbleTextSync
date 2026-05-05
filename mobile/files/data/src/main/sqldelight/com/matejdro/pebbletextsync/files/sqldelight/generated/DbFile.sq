@@ -1,0 +1,42 @@
+CREATE TABLE dbFile (
+    id INTEGER PRIMARY KEY NOT NULL,
+    title TEXT NOT NULL,
+    uri TEXT NOT NULL,
+    slots INTEGER NOT NULL,
+    orderIndex INTEGER NOT NULL
+);
+
+getAll:
+    SELECT * FROM dbFile ORDER BY orderIndex ASC;
+
+getSingle:
+    SELECT * FROM dbFile WHERE id = ? LIMIT 1;
+
+insert:
+   INSERT INTO dbFile (title, uri, slots, orderIndex) VALUES (?, ?, ?, (SELECT COALESCE(MAX(orderIndex) + 1, 0) FROM dbFile));
+
+update:
+   UPDATE dbFile SET title = ?, uri = ?, slots = ? WHERE id = ?;
+
+delete:
+    DELETE FROM dbFile WHERE id = ?;
+
+reorderUpwards {
+    UPDATE dbFile
+    SET orderIndex = orderIndex - 1
+    WHERE (orderIndex BETWEEN :fromIndex AND :toIndex);
+
+    UPDATE dbFile
+    SET orderIndex = :toIndex
+    WHERE id = :id;
+}
+
+reorderDownwards {
+    UPDATE dbFile
+    SET orderIndex = orderIndex + 1
+    WHERE (orderIndex BETWEEN :toIndex AND :fromIndex);
+
+    UPDATE dbFile
+    SET orderIndex = :toIndex
+    WHERE id = :id;
+}

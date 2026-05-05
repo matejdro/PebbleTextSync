@@ -50,6 +50,7 @@ orgJson = "20251224"
 paparazzi = "2.0.0-alpha04"
 rebugger = "1.0.1"
 showkase = "1.0.5"
+sqldelight = "2.2.1"
 tinylog = "2.7.0"
 turbine = "1.2.1"
 unmock-androidJar = "16-robolectric-13921718"
@@ -147,6 +148,11 @@ orgJson = { module = "org.json:json", version.ref = "orgJson" }
 rebugger = { module = "io.github.theapache64:rebugger", version.ref = "rebugger" }
 showkase = { module = "com.airbnb.android:showkase", version.ref = "showkase" }
 showkase-processor = { module = "com.airbnb.android:showkase-processor", version.ref = "showkase" }
+sqldelight-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
+sqldelight-async = { module = "app.cash.sqldelight:async-extensions", version.ref = "sqldelight" }
+sqldelight-coroutines = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqldelight" }
+sqldelight-gradle = { module = "app.cash.sqldelight:gradle-plugin", version.ref = "sqldelight" }
+sqldelight-jvm = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }
 tinylog-api = { module = "org.tinylog:tinylog-api-kotlin", version.ref = "tinylog" }
 tinylog-impl = { module = "org.tinylog:tinylog-impl", version.ref = "tinylog" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
