@@ -7,19 +7,22 @@ plugins {
 }
 
 android {
-   namespace = "com.matejdro.pebbletextsync.home.ui"
+   namespace = "com.matejdro.pebbletextsync.tools.ui"
 
    androidResources.enable = true
 }
 
-dependencies {
-   api(projects.home.api)
 
+dependencies {
+   api(projects.tools.api)
+
+   implementation(projects.common)
    implementation(projects.commonCompose)
+   implementation(projects.logging.api)
    implementation(projects.tools.api)
-   implementation(libs.accompanist.permissions)
    implementation(libs.androidx.core)
-   implementation(libs.androidx.compose.material3.sizeClasses)
+   implementation(libs.dispatch)
+   implementation(libs.kotlin.coroutines)
    implementation(libs.kotlinova.core)
    implementation(libs.kotlinova.navigation)
 }

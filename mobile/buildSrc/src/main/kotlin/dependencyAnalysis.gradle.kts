@@ -61,6 +61,9 @@ configure<DependencyAnalysisSubExtension> {
 
          // AndroidX Annotations are auto-included with many other AndroidX libraries. It's fine to not explicitly depend on them
          exclude("androidx.annotation:annotation")
+
+         // If serialization is used, then it must be specified explicitly with the plugin
+         exclude("org.jetbrains.kotlinx:kotlinx-serialization-core")
       }
 
       onDuplicateClassWarnings {

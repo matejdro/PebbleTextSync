@@ -16,15 +16,21 @@ import androidx.core.content.getSystemService
 import coil3.ImageLoader
 import coil3.SingletonImageLoader
 import com.matejdro.pebble.common.crashreport.CrashWindowThemeProvider
+import com.matejdro.pebble.common.logging.TinyLogKermitWriter
+import com.matejdro.pebble.common.logging.TinyLogLogcatLogger
 import com.matejdro.pebbletextsync.di.ApplicationGraph
 import com.matejdro.pebbletextsync.di.MainApplicationGraph
+import com.matejdro.pebbletextsync.logging.ErrorReportingKermitWriter
 import com.matejdro.pebbletextsync.ui.theme.TextSyncTheme
 import dev.zacsweers.metro.createGraphFactory
 import dispatch.core.DefaultDispatcherProvider
 import dispatch.core.defaultDispatcher
 import logcat.AndroidLogcatLogger
 import logcat.LogPriority
+import logcat.LogcatLogger
 import si.inova.kotlinova.core.dispatchers.AccessCallbackDispatcherProvider
+import java.io.File
+import co.touchlab.kermit.Logger as KermitLogger
 
 open class TextSyncApplication : Application(), CrashWindowThemeProvider {
    open val applicationGraph: ApplicationGraph by lazy {
@@ -49,7 +55,6 @@ open class TextSyncApplication : Application(), CrashWindowThemeProvider {
          return
       }
 
-      AndroidLogcatLogger.installOnDebuggableApp(this, minPriority = LogPriority.VERBOSE)
       Composer.setDiagnosticStackTraceMode(
          if (isDebuggable()) {
             ComposeStackTraceMode.SourceInformation
@@ -58,6 +63,7 @@ open class TextSyncApplication : Application(), CrashWindowThemeProvider {
          }
       )
 
+      setupLogging()
       enableStrictMode()
 
       DefaultDispatcherProvider.set(
@@ -171,6 +177,30 @@ open class TextSyncApplication : Application(), CrashWindowThemeProvider {
       } else {
          applicationGraph.getErrorReporter().report(e)
       }
+   }
+
+   private fun setupLogging() {
+      // Logging situation with this app is a bit complicated:
+      // logcat (the library) - used in the app part to log
+      // Kermit - used in the PebbleKit2 to log
+      // Tinylog - used to create a persistent rolling file log
+      // Both logcat and Kermit log into the Android's Logcat log, here we just need to wire them to also log
+      // into Tinylog
+
+      val directoryForLogs: File = applicationGraph.getFileLoggingController().getLogFolder()
+         .also { it.mkdirs() }
+      System.setProperty("tinylog.directory", directoryForLogs.getAbsolutePath())
+
+      val loggingThread = applicationGraph.getTinyLogLoggingThread()
+
+      if (BuildConfig.DEBUG) {
+         LogcatLogger.loggers += AndroidLogcatLogger(minPriority = LogPriority.VERBOSE)
+      }
+      LogcatLogger.loggers += TinyLogLogcatLogger(loggingThread)
+      LogcatLogger.install()
+
+      KermitLogger.addLogWriter(TinyLogKermitWriter(loggingThread))
+      KermitLogger.addLogWriter(ErrorReportingKermitWriter(applicationGraph.getErrorReporter()))
    }
 
    private fun isMainProcess(): Boolean {

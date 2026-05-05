@@ -1,6 +1,8 @@
 package com.matejdro.pebbletextsync.di
 
 import android.app.Application
+import com.matejdro.pebble.common.logging.FileLoggingController
+import com.matejdro.pebble.common.logging.TinyLogLoggingThread
 import com.matejdro.pebbletextsync.MainViewModel
 import com.matejdro.pebbletextsync.navigation.scenes.ListDetailScene
 import dev.zacsweers.metro.AppScope
@@ -34,4 +36,6 @@ interface ApplicationGraph {
    fun getDateFormatter(): AndroidDateTimeFormatter
    fun getMainViewModelFactory(): MainViewModel.Factory
    fun getListDetailSceneFactory(): ListDetailScene.Factory
+   fun getFileLoggingController(): FileLoggingController
+   fun getTinyLogLoggingThread(): TinyLogLoggingThread
 }

@@ -37,6 +37,8 @@ include(":detekt")
 include(":shared-resources")
 include(":home:api")
 include(":home:ui")
+include(":tools:api")
+include(":tools:ui")
 include(":navigation-impl")
 
 include(":logging:api")

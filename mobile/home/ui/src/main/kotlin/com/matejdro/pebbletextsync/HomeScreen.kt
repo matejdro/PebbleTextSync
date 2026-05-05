@@ -34,11 +34,11 @@ import com.matejdro.pebbletextsync.home.HomeScreenKey
 import com.matejdro.pebbletextsync.home.ui.R
 import com.matejdro.pebbletextsync.navigation.instructions.ReplaceTabContentWith
 import com.matejdro.pebbletextsync.navigation.keys.FileListScreenKey
-import com.matejdro.pebbletextsync.navigation.keys.ToolsScreenKey
 import com.matejdro.pebbletextsync.navigation.keys.base.LocalSelectedTabContent
 import com.matejdro.pebbletextsync.navigation.keys.base.SelectedTabContent
 import com.matejdro.pebbletextsync.ui.debugging.FullScreenPreviews
 import com.matejdro.pebbletextsync.ui.debugging.PreviewTheme
+import com.matejdro.tools.ui.ToolsScreenKey
 import si.inova.kotlinova.core.activity.requireActivity
 import si.inova.kotlinova.navigation.instructions.NavigationInstruction
 import si.inova.kotlinova.navigation.navigator.Navigator
