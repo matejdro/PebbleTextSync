@@ -17,6 +17,7 @@ configure<KotlinProjectExtension> {
 commonKotlinCompilerOptions {
    optIn.add("kotlinx.coroutines.ExperimentalCoroutinesApi")
    optIn.add("kotlinx.coroutines.FlowPreview")
+   optIn.add("com.google.accompanist.permissions.ExperimentalPermissionsApi")
 
    // https://blog.jetbrains.com/idea/2025/09/improved-annotation-handling-in-kotlin-2-2-less-boilerplate-fewer-surprises/
    freeCompilerArgs.add("-Xannotation-default-target=param-property")

@@ -18,6 +18,7 @@ dependencies {
 
    implementation(projects.common)
    implementation(projects.commonCompose)
+   implementation(projects.home.api)
    implementation(projects.logging.api)
    implementation(projects.tools.api)
    implementation(libs.androidx.core)

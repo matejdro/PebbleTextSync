@@ -2,4 +2,5 @@
 <resources>
     <string name="save_logs">Save logs</string>
     <string name="version">Text Sync version %1$s</string>
+    <string name="permissions">Permissions</string>
 </resources>

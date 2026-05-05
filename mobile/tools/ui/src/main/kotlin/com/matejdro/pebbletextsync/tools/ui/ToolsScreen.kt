@@ -31,6 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
+import com.matejdro.pebbletextsync.home.OnboardingScreenKey
 import com.matejdro.pebbletextsync.ui.components.ErrorAlertDialog
 import com.matejdro.pebbletextsync.ui.components.ProgressErrorSuccessScaffold
 import com.matejdro.pebbletextsync.ui.debugging.FullScreenPreviews
@@ -39,6 +40,7 @@ import com.matejdro.tools.ui.ToolsScreenKey
 import si.inova.kotlinova.compose.flow.collectAsStateWithLifecycleAndBlinkingPrevention
 import si.inova.kotlinova.core.outcome.Outcome
 import si.inova.kotlinova.navigation.di.ContributesScreenBinding
+import si.inova.kotlinova.navigation.instructions.navigateTo
 import si.inova.kotlinova.navigation.navigator.Navigator
 import si.inova.kotlinova.navigation.screens.InjectNavigationScreen
 import si.inova.kotlinova.navigation.screens.Screen
@@ -63,7 +65,9 @@ class ToolsScreen(
          ToolsScreenContent(
             state = state,
             loggingTransmissionState = logSaveStatus,
-            openPermissions = { },
+            openPermissions = {
+               navigator.navigateTo(OnboardingScreenKey)
+            },
             startLogSaving = viewModel::getLogs,
             notifyLogIntentSent = viewModel::resetLog,
          )
@@ -88,6 +92,10 @@ private fun ToolsScreenContent(
          .padding(horizontal = 16.dp)
          .fillMaxSize()
    ) {
+      item {
+         ToolButton(onClick = openPermissions, icon = R.drawable.permissions, text = R.string.permissions)
+      }
+
       item {
          ErrorAlertDialog(loggingTransmissionState)
 
