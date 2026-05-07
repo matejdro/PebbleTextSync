@@ -7,9 +7,9 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.matejdro.pebbletextsync.files.ui.FileListScreenKey
 import com.matejdro.pebbletextsync.home.HomeScreenKey
 import com.matejdro.pebbletextsync.home.OnboardingScreenKey
-import com.matejdro.pebbletextsync.navigation.keys.FileListScreenKey
 import dev.zacsweers.metro.AssistedFactory
 import dev.zacsweers.metro.AssistedInject
 import kotlinx.coroutines.flow.MutableStateFlow

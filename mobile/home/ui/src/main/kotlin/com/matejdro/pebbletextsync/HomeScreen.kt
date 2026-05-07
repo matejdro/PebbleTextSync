@@ -30,10 +30,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
+import com.matejdro.pebbletextsync.files.ui.FileListScreenKey
 import com.matejdro.pebbletextsync.home.HomeScreenKey
 import com.matejdro.pebbletextsync.home.ui.R
 import com.matejdro.pebbletextsync.navigation.instructions.ReplaceTabContentWith
-import com.matejdro.pebbletextsync.navigation.keys.FileListScreenKey
 import com.matejdro.pebbletextsync.navigation.keys.base.LocalSelectedTabContent
 import com.matejdro.pebbletextsync.navigation.keys.base.SelectedTabContent
 import com.matejdro.pebbletextsync.ui.debugging.FullScreenPreviews

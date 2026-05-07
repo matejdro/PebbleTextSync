@@ -1,8 +1,10 @@
 plugins {
    pureKotlinModule
+   navigationApi
+   testFixtures
 }
 
 dependencies {
-   implementation(libs.kotlin.coroutines)
-   implementation(libs.kotlinova.core)
+   api(libs.kotlin.coroutines)
+   api(libs.kotlinova.core)
 }

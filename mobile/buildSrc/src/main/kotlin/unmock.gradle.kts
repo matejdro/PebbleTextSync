@@ -24,6 +24,7 @@ configure<UnMockExtension> {
    keep("android.os.BaseBundle")
    keep("android.os.Bundle")
    keep("android.os.BadTypeParcelableException")
+   keep("android.os.Parcel")
    keepStartingWith("android.text.")
    keepStartingWith("android.util.")
    keep("android.view.ContextThemeWrapper")

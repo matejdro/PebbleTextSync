@@ -41,10 +41,10 @@ import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.rememberPermissionState
+import com.matejdro.pebbletextsync.files.ui.FileListScreenKey
 import com.matejdro.pebbletextsync.home.HomeScreenKey
 import com.matejdro.pebbletextsync.home.OnboardingScreenKey
 import com.matejdro.pebbletextsync.home.ui.R
-import com.matejdro.pebbletextsync.navigation.keys.FileListScreenKey
 import com.matejdro.pebbletextsync.ui.debugging.FullScreenPreviews
 import com.matejdro.pebbletextsync.ui.debugging.PreviewTheme
 import si.inova.kotlinova.navigation.instructions.ReplaceBackstack

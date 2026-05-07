@@ -1,6 +1,10 @@
 plugins {
    androidLibraryModule
    compose
+   di
+   navigation
+   showkase
+   unmock
 }
 
 android {
@@ -10,4 +14,18 @@ android {
 }
 
 dependencies {
+   api(projects.files.api)
+
+   implementation(projects.common)
+   implementation(projects.commonCompose)
+   implementation(libs.androidx.activity.compose)
+   implementation(libs.androidx.core)
+   implementation(libs.dispatch)
+   implementation(libs.kotlin.coroutines)
+   implementation(libs.kotlinova.core)
+   implementation(libs.kotlinova.navigation)
+
+   testImplementation(libs.kotlin.coroutines.test)
+   testImplementation(libs.kotlinova.core.test)
+   testImplementation(testFixtures(projects.files.api))
 }
