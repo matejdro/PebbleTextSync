@@ -1,4 +1,4 @@
-package com.matejdro.pebbletextsync.files.ui
+package com.matejdro.pebbletextsync.files.ui.list
 
 import android.content.Context
 import android.content.Intent

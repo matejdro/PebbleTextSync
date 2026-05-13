@@ -1,11 +1,12 @@
-package com.matejdro.pebbletextsync.files.ui
+package com.matejdro.pebbletextsync.files.ui.list
 
 import android.net.Uri
 import androidx.compose.runtime.Stable
 import com.matejdro.pebbletextsync.common.logging.ActionLogger
 import com.matejdro.pebbletextsync.files.SyncingFile
 import com.matejdro.pebbletextsync.files.SyncingFileRepository
-import com.matejdro.pebbletextsync.files.ui.util.FileOpenPreprocessor
+import com.matejdro.pebbletextsync.files.ui.FileListScreenKey
+import com.matejdro.pebbletextsync.files.ui.list.util.FileOpenPreprocessor
 import dev.zacsweers.metro.Inject
 import dispatch.core.withDefault
 import kotlinx.coroutines.flow.MutableStateFlow

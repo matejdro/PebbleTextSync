@@ -1,4 +1,4 @@
-package com.matejdro.pebbletextsync.files.ui
+package com.matejdro.pebbletextsync.files.ui.list
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,6 +14,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import com.matejdro.pebbletextsync.files.SyncingFile
+import com.matejdro.pebbletextsync.files.ui.FileListScreenKey
+import com.matejdro.pebbletextsync.files.ui.R
 import com.matejdro.pebbletextsync.ui.components.ProgressErrorSuccessScaffold
 import com.matejdro.pebbletextsync.ui.debugging.FullScreenPreviews
 import com.matejdro.pebbletextsync.ui.debugging.PreviewTheme

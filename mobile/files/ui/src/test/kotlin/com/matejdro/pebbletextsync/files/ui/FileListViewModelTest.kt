@@ -3,7 +3,9 @@ package com.matejdro.pebbletextsync.files.ui
 import androidx.core.net.toUri
 import com.matejdro.pebbletextsync.files.FakeSyncingFileRepository
 import com.matejdro.pebbletextsync.files.SyncingFile
-import com.matejdro.pebbletextsync.files.ui.util.FileOpenPreprocessor
+import com.matejdro.pebbletextsync.files.ui.list.FileListState
+import com.matejdro.pebbletextsync.files.ui.list.FileListViewModel
+import com.matejdro.pebbletextsync.files.ui.list.util.FileOpenPreprocessor
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runCurrent
