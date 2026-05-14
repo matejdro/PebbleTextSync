@@ -9,5 +9,6 @@ data class SyncingFile(
 ) {
    companion object {
       const val MAX_SLOTS = 20
+      const val MAX_TITLE_LENGTH = 20
    }
 }

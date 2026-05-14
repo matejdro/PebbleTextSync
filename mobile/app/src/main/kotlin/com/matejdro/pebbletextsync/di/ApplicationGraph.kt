@@ -5,6 +5,7 @@ import androidx.work.WorkerFactory
 import com.matejdro.pebble.common.logging.FileLoggingController
 import com.matejdro.pebble.common.logging.TinyLogLoggingThread
 import com.matejdro.pebbletextsync.MainViewModel
+import com.matejdro.pebbletextsync.bluetooth.WatchSyncerImpl
 import com.matejdro.pebbletextsync.navigation.scenes.ListDetailScene
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.DependencyGraph
@@ -40,6 +41,6 @@ interface ApplicationGraph {
    fun getListDetailSceneFactory(): ListDetailScene.Factory
    fun getFileLoggingController(): FileLoggingController
    fun getTinyLogLoggingThread(): TinyLogLoggingThread
-
    fun getWorkerFactory(): WorkerFactory
+   fun getWatchSyncer(): WatchSyncerImpl
 }

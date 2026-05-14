@@ -1,6 +1,7 @@
 plugins {
    androidLibraryModule
    di
+   unmock
 }
 
 dependencies {
@@ -8,7 +9,15 @@ dependencies {
 
    implementation(projects.bluetoothCommon)
    implementation(projects.bucketsync.api)
+   implementation(projects.files.api)
+   implementation(libs.androidx.core)
+   implementation(libs.dispatch)
    implementation(libs.logcat)
+   implementation(libs.okio)
    implementation(libs.pebblekit)
    implementation(libs.kotlin.coroutines)
+   implementation(libs.kotlinova.core)
+
+   testImplementation(testFixtures(projects.files.api))
+   testImplementation(projects.bucketsync.test)
 }

@@ -28,6 +28,8 @@ import com.matejdro.pebbletextsync.ui.theme.TextSyncTheme
 import dev.zacsweers.metro.createGraphFactory
 import dispatch.core.DefaultDispatcherProvider
 import dispatch.core.defaultDispatcher
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.launch
 import logcat.AndroidLogcatLogger
 import logcat.LogPriority
 import logcat.LogcatLogger
@@ -93,6 +95,16 @@ open class TextSyncApplication : Application(), CrashWindowThemeProvider {
             .setWorkerCoroutineContext(applicationGraph.getDefaultCoroutineScope().coroutineContext)
             .build()
       )
+
+      applicationGraph.getDefaultCoroutineScope().launch {
+         try {
+            applicationGraph.getWatchSyncer().init()
+         } catch (e: CancellationException) {
+            throw e
+         } catch (e: Exception) {
+            applicationGraph.getErrorReporter().report(e)
+         }
+      }
    }
 
    /**

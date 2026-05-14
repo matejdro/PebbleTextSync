@@ -21,6 +21,14 @@ update:
 delete:
     DELETE FROM dbFile WHERE id = ?;
 
+getReorderUpwardsAffectedIds:
+    SELECT id FROM dbFile
+    WHERE (orderIndex BETWEEN :fromIndex AND :toIndex);
+
+getReorderDownwardsAffectedIds:
+    SELECT id FROM dbFile
+    WHERE (orderIndex BETWEEN :toIndex AND :fromIndex);
+
 reorderUpwards {
     UPDATE dbFile
     SET orderIndex = orderIndex - 1
