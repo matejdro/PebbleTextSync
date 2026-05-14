@@ -1,6 +1,7 @@
 #include "window_file_list.h"
 #include "pebble.h"
 #include "window_status.h"
+#include "window_text.h"
 #include "commons/connection/bucket_sync.h"
 #include "../connection/packets.h"
 #include "commons/bytes.h"
@@ -182,6 +183,7 @@ static void on_button_down_pressed(ClickRecognizerRef recognizer, void* context)
 static void on_button_select_pressed(ClickRecognizerRef recognizer, void* context)
 {
     const MenuIndex index = menu_layer_get_selected_index(menu);
+    window_text_show(files[index.row].bucket_id);
 }
 
 static void configure_buttons(void* context)
@@ -193,8 +195,6 @@ static void configure_buttons(void* context)
 
 void window_file_list_show()
 {
-    APP_LOG(APP_LOG_LEVEL_INFO, "File list show");
-
     Window* window = window_create();
 
     window_set_window_handlers(window, (WindowHandlers)
