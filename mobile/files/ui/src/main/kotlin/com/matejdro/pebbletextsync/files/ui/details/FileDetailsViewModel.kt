@@ -74,9 +74,10 @@ class FileDetailsViewModel(
       val existing = _uiState.value.data?.file ?: return
 
       debouncer.executeDebouncing {
-         syncingFileRepository.update(
-            transform(existing),
-         )
+         val newFile = transform(existing)
+         if (newFile != existing) {
+            syncingFileRepository.update(newFile)
+         }
       }
    }
 
