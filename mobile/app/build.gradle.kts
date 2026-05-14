@@ -133,6 +133,7 @@ dependencies {
    implementation(projects.bluetooth.api)
    implementation(projects.bluetooth.data)
    implementation(projects.bluetoothCommon)
+   implementation(projects.bucketsync.api)
    implementation(projects.bucketsync.data)
    implementation(projects.common)
    implementation(projects.commonNavigation)

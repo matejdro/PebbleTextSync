@@ -7,6 +7,7 @@ import com.matejdro.pebble.common.logging.TinyLogLoggingThread
 import com.matejdro.pebbletextsync.MainViewModel
 import com.matejdro.pebbletextsync.bluetooth.WatchSyncerImpl
 import com.matejdro.pebbletextsync.navigation.scenes.ListDetailScene
+import com.matejdro.pebbletextsync.receiving.PebbleListenerService
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.DependencyGraph
 import dev.zacsweers.metro.Provides
@@ -43,4 +44,5 @@ interface ApplicationGraph {
    fun getTinyLogLoggingThread(): TinyLogLoggingThread
    fun getWorkerFactory(): WorkerFactory
    fun getWatchSyncer(): WatchSyncerImpl
+   fun inject(service: PebbleListenerService)
 }

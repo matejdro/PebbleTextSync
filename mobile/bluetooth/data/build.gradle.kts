@@ -19,5 +19,7 @@ dependencies {
    implementation(libs.kotlinova.core)
 
    testImplementation(testFixtures(projects.files.api))
+   testImplementation(projects.bucketsync.data)
    testImplementation(projects.bucketsync.test)
+   testImplementation(libs.kotlinova.core.test)
 }
