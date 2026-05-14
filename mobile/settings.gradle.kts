@@ -29,6 +29,8 @@ rootProject.name = "PebbleTextSync"
 
 include(":app")
 include(":app-screenshot-tests")
+include(":bluetooth:api")
+include(":bluetooth:data")
 include(":common")
 include(":common-android")
 include(":common-compose")
@@ -43,6 +45,17 @@ include(":home:ui")
 include(":tools:api")
 include(":tools:ui")
 include(":navigation-impl")
+
+include(":bluetooth-common")
+project(":bluetooth-common").projectDir = file("../PebbleCommons/mobile/bluetooth-common")
+
+include(":bucketsync:api")
+project(":bucketsync:api").projectDir = file("../PebbleCommons/mobile/bucketsync/api")
+include(":bucketsync:data")
+project(":bucketsync:data").projectDir = file("../PebbleCommons/mobile/bucketsync/data")
+include(":bucketsync:test")
+project(":bucketsync:test").projectDir = file("../PebbleCommons/mobile/bucketsync/test")
+project(":bucketsync").projectDir = file("../PebbleCommons/mobile/bucketsync")
 
 include(":logging:api")
 project(":logging:api").projectDir = file("../PebbleCommons/mobile/logging/api")

@@ -24,6 +24,7 @@ androidx-test-runner = "1.7.0"
 androidx-test-services = "1.6.0"
 androidx-test-uiautomator = "2.3.0"
 androidx-startup = "1.2.0"
+androidx-workManager = "2.11.2"
 coil = "3.4.0"
 dependencyAnalysis = "3.7.0"
 desugarJdkLibs = "2.1.5"
@@ -48,6 +49,7 @@ okhttp = "5.3.2"
 okio = "3.17.0"
 orgJson = "20251224"
 paparazzi = "2.0.0-alpha04"
+pebblekit = "1.1.0"
 rebugger = "1.0.1"
 showkase = "1.0.5"
 sqldelight = "2.2.1"
@@ -98,6 +100,7 @@ androidx-test-orchestrator = { module = "androidx.test:orchestrator", version.re
 androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidx-test-runner" }
 androidx-test-services = { module = "androidx.test.services:test-services", version.ref = "androidx-test-services" }
 androidx-test-uiautomator = { group = "androidx.test.uiautomator", name = "uiautomator", version.ref = "androidx-test-uiautomator" }
+androidx-workManager = { module = "androidx.work:work-runtime-ktx", version.ref = "androidx-workManager" }
 coil = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
 coil-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coil" }
 dependencyAnalysis = { module = "com.autonomousapps:dependency-analysis-gradle-plugin", version.ref = "dependencyAnalysis" }
@@ -146,6 +149,10 @@ okhttp-mockWebServer = { module = "com.squareup.okhttp3:mockwebserver3", version
 okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 orgJson = { module = "org.json:json", version.ref = "orgJson" }
 rebugger = { module = "io.github.theapache64:rebugger", version.ref = "rebugger" }
+pebblekit = { module = "io.rebble.pebblekit2:client", version.ref = "pebblekit" }
+pebblekit-api = { module = "io.rebble.pebblekit2:client-api", version.ref = "pebblekit" }
+pebblekit-common = { module = "io.rebble.pebblekit2:common", version.ref = "pebblekit" }
+pebblekit-common-api = { module = "io.rebble.pebblekit2:common-api", version.ref = "pebblekit" }
 showkase = { module = "com.airbnb.android:showkase", version.ref = "showkase" }
 showkase-processor = { module = "com.airbnb.android:showkase-processor", version.ref = "showkase" }
 sqldelight-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }

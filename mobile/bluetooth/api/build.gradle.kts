@@ -1,0 +1,8 @@
+plugins {
+   pureKotlinModule
+   testFixtures
+}
+
+dependencies {
+
+}

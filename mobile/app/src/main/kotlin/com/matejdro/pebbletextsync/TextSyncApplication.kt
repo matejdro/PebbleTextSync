@@ -7,12 +7,15 @@ import android.os.Build
 import android.os.StrictMode
 import android.os.StrictMode.VmPolicy
 import android.os.strictmode.Violation
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composer
 import androidx.compose.runtime.ExperimentalComposeRuntimeApi
 import androidx.compose.runtime.tooling.ComposeStackTraceMode
 import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
+import androidx.work.Configuration
+import androidx.work.WorkManager
 import coil3.ImageLoader
 import coil3.SingletonImageLoader
 import com.matejdro.pebble.common.crashreport.CrashWindowThemeProvider
@@ -81,6 +84,15 @@ open class TextSyncApplication : Application(), CrashWindowThemeProvider {
             .interceptorCoroutineContext(applicationGraph.getDefaultCoroutineScope().defaultDispatcher)
             .build()
       }
+
+      WorkManager.initialize(
+         this,
+         Configuration.Builder()
+            .setWorkerFactory(applicationGraph.getWorkerFactory())
+            .setMinimumLoggingLevel(Log.INFO)
+            .setWorkerCoroutineContext(applicationGraph.getDefaultCoroutineScope().coroutineContext)
+            .build()
+      )
    }
 
    /**

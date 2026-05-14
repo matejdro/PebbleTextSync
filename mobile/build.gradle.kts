@@ -91,6 +91,15 @@ dependencyAnalysis {
       bundle("tinylog") {
          includeGroup("org.tinylog")
       }
+
+      bundle("PebbleKit2") {
+         includeGroup("io.rebble.pebblekit2")
+      }
+
+      bundle("WorkManager") {
+         includeGroup("androidx.work")
+         includeDependency("com.google.guava:listenablefuture")
+      }
    }
 }
 

@@ -130,6 +130,10 @@ afterEvaluate {
 
 dependencies {
    implementation(projects.home.ui)
+   implementation(projects.bluetooth.api)
+   implementation(projects.bluetooth.data)
+   implementation(projects.bluetoothCommon)
+   implementation(projects.bucketsync.data)
    implementation(projects.common)
    implementation(projects.commonNavigation)
    implementation(projects.commonCompose)
@@ -153,6 +157,7 @@ dependencies {
    implementation(libs.androidx.lifecycle.viewModel.compose)
    implementation(libs.androidx.navigation3)
    implementation(libs.androidx.navigation3)
+   implementation(libs.androidx.workManager)
    implementation(libs.coil)
    implementation(libs.dispatch)
    implementation(libs.logcat)
@@ -162,6 +167,7 @@ dependencies {
    implementation(libs.kotlinova.navigation)
    implementation(libs.kotlinova.navigation.deeplink)
    implementation(libs.kotlinova.navigation.navigation3)
+   implementation(libs.pebblekit)
    implementation(libs.sqldelight.android)
    implementation(libs.tinylog.api)
 

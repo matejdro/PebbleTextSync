@@ -1,6 +1,7 @@
 package com.matejdro.pebbletextsync.di
 
 import android.app.Application
+import androidx.work.WorkerFactory
 import com.matejdro.pebble.common.logging.FileLoggingController
 import com.matejdro.pebble.common.logging.TinyLogLoggingThread
 import com.matejdro.pebbletextsync.MainViewModel
@@ -27,6 +28,7 @@ interface MainApplicationGraph : ApplicationGraph {
    }
 }
 
+@Suppress("ComplexInterface") // DI
 interface ApplicationGraph {
    fun getErrorReporter(): ErrorReporter
    fun getDefaultCoroutineScope(): DefaultCoroutineScope
@@ -38,4 +40,6 @@ interface ApplicationGraph {
    fun getListDetailSceneFactory(): ListDetailScene.Factory
    fun getFileLoggingController(): FileLoggingController
    fun getTinyLogLoggingThread(): TinyLogLoggingThread
+
+   fun getWorkerFactory(): WorkerFactory
 }
