@@ -4,6 +4,7 @@ import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import com.matejdro.pebbletextsync.files.sqldelight.generated.Database
 import com.matejdro.pebbletextsync.files.sqldelight.generated.DbFileQueries
+import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -19,8 +20,8 @@ class SyncingFileRepositoryImplTest {
 
    @Test
    fun `Insert and get files`() = scope.runTest {
-      repo.insert(SyncingFile("File A", "content://files/A", slots = 3))
-      repo.insert(SyncingFile("File B", "content://files/B"))
+      repo.insert(SyncingFile("File A", "content://files/A", slots = 3)) shouldBe 1
+      repo.insert(SyncingFile("File B", "content://files/B")) shouldBe 2
 
       repo.getAll().first().shouldBeSuccessWithData(
          listOf(
@@ -99,6 +100,23 @@ class SyncingFileRepositoryImplTest {
             SyncingFile("File A", "content://files/A", id = 1, orderIndex = 2),
          )
       )
+   }
+
+   @Test
+   fun `Insert and get single file`() = scope.runTest {
+      repo.insert(SyncingFile("File A", "content://files/A", slots = 3))
+      repo.insert(SyncingFile("File B", "content://files/B"))
+
+      repo.getSingle(id = 1).first()
+         .shouldBeSuccessWithData(SyncingFile("File A", "content://files/A", orderIndex = 0, id = 1, slots = 3))
+   }
+
+   @Test
+   fun `Return null when single file does not exist`() = scope.runTest {
+      repo.insert(SyncingFile("File A", "content://files/A", slots = 3))
+      repo.insert(SyncingFile("File B", "content://files/B"))
+
+      repo.getSingle(id = 3).first().shouldBeSuccessWithData(null)
    }
 }
 

@@ -8,19 +8,30 @@ import si.inova.kotlinova.core.outcome.Outcome
 
 class FakeSyncingFileRepository : SyncingFileRepository {
    private val files = MutableStateFlow<List<SyncingFile>>(emptyList())
+   var numUpdates = 0
 
    override fun getAll(): Flow<Outcome<List<SyncingFile>>> {
       return files.map { Outcome.Success(it) }
    }
 
-   override suspend fun insert(file: SyncingFile) {
+   override fun getSingle(id: Int): Flow<Outcome<SyncingFile?>> {
+      return files.map { files -> Outcome.Success(files.find { it.id == id }) }
+   }
+
+   override suspend fun insert(file: SyncingFile): Int {
+      val orderIndex = files.value.size
+      val updatedFile = file.copy(id = orderIndex + 1, orderIndex = orderIndex)
+
       files.update { list ->
-         val orderIndex = list.size
-         list + file.copy(id = orderIndex + 1, orderIndex = orderIndex)
+         list + updatedFile
       }
+
+      return updatedFile.id
    }
 
    override suspend fun update(file: SyncingFile) {
+      numUpdates++
+
       files.update { fileList ->
          fileList.map { fileToCheck ->
             if (fileToCheck.id == file.id) {

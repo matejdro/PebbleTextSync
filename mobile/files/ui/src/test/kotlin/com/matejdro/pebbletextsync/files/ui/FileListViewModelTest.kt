@@ -6,16 +6,19 @@ import com.matejdro.pebbletextsync.files.SyncingFile
 import com.matejdro.pebbletextsync.files.ui.list.FileListState
 import com.matejdro.pebbletextsync.files.ui.list.FileListViewModel
 import com.matejdro.pebbletextsync.files.ui.list.util.FileOpenPreprocessor
+import io.kotest.matchers.collections.shouldContainExactly
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
+import si.inova.kotlinova.core.test.TestScopeWithDispatcherProvider
 import si.inova.kotlinova.core.test.outcomes.shouldBeSuccessWithData
 import si.inova.kotlinova.core.test.outcomes.testCoroutineResourceManager
+import si.inova.kotlinova.navigation.test.FakeNavigator
 
 class FileListViewModelTest {
-   private val scope = TestScope()
+   private val scope = TestScopeWithDispatcherProvider()
+   private val navigator = FakeNavigator(FileListScreenKey)
 
    private val fileOpenPreprocessor = FileOpenPreprocessor { uri ->
       if (uri.toString() == "content://test_file") {
@@ -31,7 +34,8 @@ class FileListViewModelTest {
       resources = scope.testCoroutineResourceManager(),
       actionLogger = { },
       fileOpenPreprocessor = fileOpenPreprocessor,
-      syncingFileRepository = syncingFileRepository
+      syncingFileRepository = syncingFileRepository,
+      navigator = navigator,
    )
 
    @Test
@@ -44,6 +48,8 @@ class FileListViewModelTest {
             SyncingFile("File name", "content://test_file", id = 1, orderIndex = 0)
          )
       )
+
+      navigator.backstack.shouldContainExactly(FileListScreenKey, FileDetailsScreenKey(1))
    }
 
    @Test

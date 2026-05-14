@@ -21,8 +21,15 @@ class SyncingFileRepositoryImpl(
       }.flowOnDefault()
    }
 
-   override suspend fun insert(file: SyncingFile) = withDefault<Unit> {
+   override fun getSingle(id: Int): Flow<Outcome<SyncingFile?>> {
+      return fileQueries.getSingle(id.toLong()).asFlow().map { query ->
+         Outcome.Success(query.executeAsOneOrNull()?.toSyncingFile())
+      }.flowOnDefault()
+   }
+
+   override suspend fun insert(file: SyncingFile): Int = withDefault {
       fileQueries.insert(title = file.title, uri = file.contentUri, slots = file.slots.toLong())
+      fileQueries.lastInsertRowId().executeAsOne().toInt()
    }
 
    override suspend fun update(file: SyncingFile) = withDefault<Unit> {
