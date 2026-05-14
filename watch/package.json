@@ -1,0 +1,59 @@
+{
+  "name": "textsync",
+  "author": "matejdro",
+  "version": "0.1",
+  "keywords": [
+    "pebble-app"
+  ],
+  "private": false,
+  "dependencies": {},
+  "pebble": {
+    "displayName": "Text Sync",
+    "uuid": "a5327cdc-5512-463f-88a8-3eff3fa55ae9",
+    "sdkVersion": "3",
+    "enableMultiJS": true,
+    "targetPlatforms": [
+      "basalt",
+      "diorite",
+      "emery"
+    ],
+    "watchapp": {
+      "watchface": false
+    },
+    "resources": {
+      "media": [
+        {
+          "type": "bitmap",
+          "name": "MENU_ICON",
+          "file": "launcher_icon.png",
+          "menuIcon": true
+        },
+        {
+          "type": "bitmap",
+          "name": "INDICATOR_BUSY",
+          "file": "busy.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "INDICATOR_DISCONNECTED",
+          "file": "disconnected.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "INDICATOR_ERROR",
+          "file": "error.png"
+        }
+      ]
+    },
+    "companionApp": {
+      "android": {
+        "url": "https://github.com/matejdro/PebbleTextSync",
+        "apps": [
+          {
+            "package": "com.matejdro.pebbletextsync"
+          }
+        ]
+      }
+    }
+  }
+}
