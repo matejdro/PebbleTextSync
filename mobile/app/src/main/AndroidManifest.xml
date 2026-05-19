@@ -5,6 +5,9 @@
     <!-- Required for crash reporting -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+    <!-- Reorder vibrations -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+
     <application
         android:name=".TextSyncApplication"
         android:allowBackup="true"

@@ -49,6 +49,10 @@ class FakeSyncingFileRepository : SyncingFileRepository {
          list.toMutableList().apply {
             remove(existing)
             add(toIndex, existing)
+
+            for ((index, element) in this.withIndex()) {
+               this[index] = element.copy(orderIndex = index)
+            }
          }
       }
    }

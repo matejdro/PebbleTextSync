@@ -87,4 +87,25 @@ class FileListViewModelTest {
 
       navigator.backstack.shouldContainExactly(FileListScreenKey, FileDetailsScreenKey(1))
    }
+
+   @Test
+   fun `Reorder files`() = scope.runTest {
+      syncingFileRepository.insert(SyncingFile("File A", "content://files/A", slots = 3))
+      syncingFileRepository.insert(SyncingFile("File B", "content://files/B"))
+
+      viewModel.onServiceRegistered()
+      runCurrent()
+
+      viewModel.reorder(2, toIndex = 0)
+      runCurrent()
+
+      viewModel.uiState.first().shouldBeSuccessWithData(
+         FileListState(
+            listOf(
+               SyncingFile("File B", "content://files/B", orderIndex = 0, id = 2, slots = 1),
+               SyncingFile("File A", "content://files/A", orderIndex = 1, id = 1, slots = 3),
+            )
+         )
+      )
+   }
 }

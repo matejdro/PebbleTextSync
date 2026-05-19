@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -18,6 +19,7 @@ import com.matejdro.pebbletextsync.files.SyncingFile
 import com.matejdro.pebbletextsync.files.ui.FileDetailsScreenKey
 import com.matejdro.pebbletextsync.files.ui.FileListScreenKey
 import com.matejdro.pebbletextsync.files.ui.R
+import com.matejdro.pebbletextsync.files.ui.list.util.ReorderableListContainer
 import com.matejdro.pebbletextsync.navigation.instructions.OpenScreenOrReplaceExistingType
 import com.matejdro.pebbletextsync.ui.components.ProgressErrorSuccessScaffold
 import com.matejdro.pebbletextsync.ui.debugging.FullScreenPreviews
@@ -52,6 +54,7 @@ class FileListScreen(
             addNewFile = {
                openFileLauncher.launch(arrayOf("text/*"))
             },
+            reorder = viewModel::reorder,
             openDetails = {
                navigator.navigate(OpenScreenOrReplaceExistingType(FileDetailsScreenKey(it)))
             }
@@ -65,6 +68,7 @@ private fun FileListScreenContent(
    state: FileListState,
    addNewFile: () -> Unit,
    openDetails: (id: Int) -> Unit,
+   reorder: (id: Int, toIndex: Int) -> Unit,
 ) {
    Scaffold(
       floatingActionButton = {
@@ -73,16 +77,21 @@ private fun FileListScreenContent(
          }
       }
    ) { scaffoldPadding ->
-      LazyColumn(contentPadding = scaffoldPadding) {
-         itemsWithDivider(state.files) { file ->
-            Text(
-               file.title,
-               Modifier
-                  .padding(32.dp)
-                  .fillMaxWidth()
-                  .animateItem()
-                  .clickable(onClick = { openDetails(file.id) })
-            )
+      val listState = rememberLazyListState()
+      ReorderableListContainer(state.files, listState) { items ->
+         LazyColumn(contentPadding = scaffoldPadding, state = listState) {
+            itemsWithDivider(items, key = { it.id }) { file ->
+               ReorderableListItem(file.id, file, setOrder = reorder) { modifier, _ ->
+                  Text(
+                     file.title,
+                     modifier
+                        .padding(32.dp)
+                        .fillMaxWidth()
+                        .animateItem()
+                        .clickable(onClick = { openDetails(file.id) })
+                  )
+               }
+            }
          }
       }
    }
@@ -102,6 +111,7 @@ internal fun FileListScreenContentPreview() {
          ),
          addNewFile = {},
          openDetails = {},
+         reorder = { _, _ -> }
       )
    }
 }

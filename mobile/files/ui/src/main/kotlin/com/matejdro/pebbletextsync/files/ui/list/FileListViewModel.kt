@@ -61,6 +61,11 @@ class FileListViewModel(
 
       navigator.navigate(OpenScreenOrReplaceExistingType(FileDetailsScreenKey(addedFileId)))
    }
+
+   fun reorder(id: Int, toIndex: Int = -1) = resources.launchWithExceptionReporting {
+      actionLogger.logAction { "FileListViewModel.reorder(id = $id, toIndex = $toIndex)" }
+      syncingFileRepository.reorder(id, toIndex)
+   }
 }
 
 data class FileListState(

@@ -21,6 +21,7 @@ dependencies {
    implementation(projects.commonCompose)
    implementation(libs.androidx.activity.compose)
    implementation(libs.androidx.core)
+   implementation(libs.composeDnd)
    implementation(libs.dispatch)
    implementation(libs.kotlin.coroutines)
    implementation(libs.kotlinova.core)
