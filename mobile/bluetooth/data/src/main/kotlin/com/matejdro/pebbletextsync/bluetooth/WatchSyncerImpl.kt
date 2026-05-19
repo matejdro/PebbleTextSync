@@ -3,6 +3,7 @@ package com.matejdro.pebbletextsync.bluetooth
 import androidx.core.net.toUri
 import com.matejdro.bucketsync.BucketSyncRepository
 import com.matejdro.pebble.bluetooth.common.util.LimitingStringEncoder
+import com.matejdro.pebble.bluetooth.common.util.fixPebbleIndentation
 import com.matejdro.pebbletextsync.bluetooth.util.FileContentsReader
 import com.matejdro.pebbletextsync.files.SyncingFile
 import com.matejdro.pebbletextsync.files.SyncingFileRepository
@@ -37,7 +38,7 @@ class WatchSyncerImpl(
          val fileContents = fileReader.read(
             fileMetadata.contentUri.toUri(),
             fileMetadata.slots * BucketSyncRepository.MAX_BUCKET_SIZE_BYTES
-         )
+         ).fixPebbleIndentation()
 
          val buffer = Buffer()
 
