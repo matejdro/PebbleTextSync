@@ -18,8 +18,13 @@ insert:
 update:
    UPDATE dbFile SET title = ?, uri = ?, slots = ? WHERE id = ?;
 
-delete:
-    DELETE FROM dbFile WHERE id = ?;
+delete {
+    UPDATE dbFile
+    SET orderIndex = orderIndex - 1
+    WHERE orderIndex > (SELECT orderIndex FROM dbFile WHERE id = :id);
+
+    DELETE FROM dbFile WHERE id = :id;
+}
 
 getReorderUpwardsAffectedIds:
     SELECT id FROM dbFile

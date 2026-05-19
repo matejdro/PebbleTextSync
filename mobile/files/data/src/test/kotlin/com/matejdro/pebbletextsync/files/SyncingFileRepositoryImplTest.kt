@@ -137,6 +137,25 @@ class SyncingFileRepositoryImplTest {
 
       repo.getSingle(id = 3).first().shouldBeSuccessWithData(null)
    }
+
+   @Test
+   fun `Fix order indexes upon deleting`() = scope.runTest {
+      repo.insert(SyncingFile("File A", "content://files/A"))
+      repo.insert(SyncingFile("File B", "content://files/B"))
+      repo.insert(SyncingFile("File C", "content://files/C"))
+      runCurrent()
+      watchSyncer.syncedFiles.clear()
+
+      repo.delete(1)
+      runCurrent()
+
+      repo.getAll().first().shouldBeSuccessWithData(
+         listOf(
+            SyncingFile("File B", "content://files/B", id = 2, orderIndex = 0),
+            SyncingFile("File C", "content://files/C", id = 3, orderIndex = 1),
+         )
+      )
+   }
 }
 
 internal fun createTestFileQueries(
