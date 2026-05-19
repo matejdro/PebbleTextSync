@@ -1,6 +1,7 @@
 #include "window_text.h"
 
 #include "commons/connection/bucket_sync.h"
+#include "commons/structures/vec.h"
 #include "layers/status_bar.h"
 
 // 20 slots (max) with approx max bucket size
@@ -11,13 +12,28 @@ static TextLayer* text_layer;
 static CustomStatusBarLayer* status_bar_layer;
 static uint8_t initial_bucket_id;
 static char text[MAX_TEXT_LENGTH];
-
+uint8_t* relevant_extra_buckets;
 
 static void load_text();
 
+static bool is_bucket_relevant(const uint8_t bucket_id)
+{
+    for (size_t i = 0; i < vector_size(relevant_extra_buckets); i++)
+    {
+        if (relevant_extra_buckets[i] == bucket_id)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 static void on_bucket_changed(BucketMetadata bucket, void* context)
 {
-    load_text();
+    if (bucket.id == initial_bucket_id || is_bucket_relevant(bucket.id))
+    {
+        load_text();
+    }
 }
 
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
@@ -45,6 +61,8 @@ static void window_load(Window* window)
 
     layer_add_child(window_layer, status_bar_layer->layer);
     layer_add_child(window_layer, scroll_layer_get_layer(scroll_layer));
+
+    relevant_extra_buckets = vector_create();
 }
 
 static void window_unload(Window* window)
@@ -53,6 +71,7 @@ static void window_unload(Window* window)
     custom_status_bar_layer_destroy(status_bar_layer);
     text_layer_destroy(text_layer);
     window_destroy(window);
+    vector_free(relevant_extra_buckets);
 }
 
 static void window_show(Window* window)
@@ -88,6 +107,8 @@ void window_text_show(const uint8_t id)
 
 static void load_text()
 {
+    vector_clear(relevant_extra_buckets);
+
     uint8_t bucket_data[PERSIST_DATA_MAX_LENGTH];
     if (!bucket_sync_load_bucket(initial_bucket_id, bucket_data))
     {
@@ -95,12 +116,32 @@ static void load_text()
         return;
     }
 
-    const uint8_t bucket_size = bucket_sync_get_bucket_size(initial_bucket_id);
+    const uint8_t first_bucket_size = bucket_sync_get_bucket_size(initial_bucket_id);
 
     const size_t title_length = strlen((const char*)bucket_data);
 
-    const size_t body_length = bucket_size - title_length - 1;
-    strncpy(text, (const char*)&bucket_data[title_length + 1], body_length);
+    const size_t first_bucket_body_length = first_bucket_size - title_length - 1;
+    uint8_t next_text_bucket = bucket_data[title_length + 1];
+
+    size_t text_position = first_bucket_body_length;
+    strncpy(text, (const char*)&bucket_data[title_length + 2], first_bucket_body_length);
+
+    while (next_text_bucket != 0)
+    {
+        if (!bucket_sync_load_bucket(next_text_bucket, bucket_data))
+        {
+            break;
+        }
+
+        vector_add(&relevant_extra_buckets, uint8_t, next_text_bucket);
+        const uint8_t bucket_size = bucket_sync_get_bucket_size(next_text_bucket);
+        next_text_bucket = bucket_data[0];
+        const uint8_t body_length = bucket_size - 1;
+
+        strncpy(&text[text_position], (const char*)&bucket_data[1], body_length);
+        text_position += body_length;
+    }
+    text[text_position] = '\0';
 
     text_layer_set_text(text_layer, text);
     GSize text_size = text_layer_get_content_size(text_layer);

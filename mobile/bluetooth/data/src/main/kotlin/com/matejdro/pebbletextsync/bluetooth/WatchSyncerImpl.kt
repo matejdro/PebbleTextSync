@@ -11,10 +11,14 @@ import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import dispatch.core.withDefault
 import kotlinx.coroutines.flow.first
+import logcat.logcat
 import okio.Buffer
 import si.inova.kotlinova.core.exceptions.UnknownCauseException
 import si.inova.kotlinova.core.outcome.Outcome
 import si.inova.kotlinova.core.reporting.ErrorReporter
+import java.nio.ByteBuffer
+import java.nio.CharBuffer
+import java.nio.charset.StandardCharsets
 
 @ContributesBinding(AppScope::class)
 class WatchSyncerImpl(
@@ -24,9 +28,11 @@ class WatchSyncerImpl(
    private val errorReporter: ErrorReporter,
 ) : WatchSyncer {
    private val stringEncoder = LimitingStringEncoder()
+   private val utf8Encoder = StandardCharsets.UTF_8.newEncoder()
 
    @Suppress("MissingUseCall") // Buffer does not need closing
    override suspend fun syncFile(id: Int) = withDefault {
+      logcat { "Syncing file $id" }
       val fileMetadataOutcome = fileRepository.getSingle(id).first()
       if (fileMetadataOutcome !is Outcome.Success) {
          errorReporter.report(UnknownCauseException("Got non-success on file syncing: $fileMetadataOutcome"))
@@ -34,34 +40,87 @@ class WatchSyncerImpl(
       }
 
       val fileMetadata = fileMetadataOutcome.data
-      if (fileMetadata != null) {
-         val fileContents = fileReader.read(
-            fileMetadata.contentUri.toUri(),
-            fileMetadata.slots * BucketSyncRepository.MAX_BUCKET_SIZE_BYTES
-         ).fixPebbleIndentation()
+      if (fileMetadata == null) {
+         logcat { "File $id not found, deleting..." }
+         bucketSyncRepository.deleteGroup(id.toString())
+         return@withDefault
+      }
+      val fileIdString = fileMetadata.id.toString()
 
+      val fileContents = fileReader.read(
+         fileMetadata.contentUri.toUri(),
+         fileMetadata.slots * BucketSyncRepository.MAX_BUCKET_SIZE_BYTES
+      ).fixPebbleIndentation()
+
+      val encodedTitle =
+         stringEncoder.encodeSizeLimited(fileMetadata.title, SyncingFile.MAX_TITLE_LENGTH_BYTES, ellipsize = false)
+            .encodedString
+
+      val contentBuffer = CharBuffer.wrap(fileContents)
+      val byteBuffer = ByteBuffer.allocate(BucketSyncRepository.MAX_BUCKET_SIZE_BYTES - 1)
+
+      byteBuffer.position(encodedTitle.size + 1)
+      val firstBucketResult = utf8Encoder.encode(contentBuffer, byteBuffer, true)
+      val firstBucketTextBody = byteBuffer.array().copyOfRange(encodedTitle.size + 1, byteBuffer.position())
+
+      val extraTextBodies = buildList {
+         if (!firstBucketResult.isUnderflow) {
+            byteBuffer.rewind()
+
+            var bucketsLeft = fileMetadata.slots
+            while (--bucketsLeft > 0) {
+               val result = utf8Encoder.encode(contentBuffer, byteBuffer, true)
+               add(byteBuffer.array().copyOfRange(0, byteBuffer.position()))
+               if (result.isUnderflow) {
+                  break
+               }
+
+               byteBuffer.rewind()
+            }
+         }
+      }
+
+      // Update buckets in reverse order to get the ids of the next bucket in the sequence
+      var nextBucketId = 0
+
+      val savedBuckets = mutableListOf((fileMetadata.id * BUCKET_ID_MULTIPLIER).toString())
+
+      for ((index, body) in extraTextBodies.withIndex().reversed()) {
          val buffer = Buffer()
 
-         val encodedTitle =
-            stringEncoder.encodeSizeLimited(fileMetadata.title, SyncingFile.MAX_TITLE_LENGTH_BYTES, ellipsize = false)
-               .encodedString
+         buffer.writeByte(nextBucketId)
+         buffer.write(body)
 
-         buffer.write(encodedTitle)
-         buffer.writeByte(0)
+         val indexIncludingFirst = index + 1
 
-         val maxBodySize = BucketSyncRepository.MAX_BUCKET_SIZE_BYTES - encodedTitle.size - 1
-         val encodedBody = stringEncoder.encodeSizeLimited(fileContents, maxBodySize, ellipsize = false).encodedString
-
-         buffer.write(encodedBody)
-
-         bucketSyncRepository.updateBucketDynamic(
-            (id * BUCKET_ID_MULTIPLIER).toString(),
+         val bucketId = (fileMetadata.id * BUCKET_ID_MULTIPLIER + indexIncludingFirst).toString()
+         nextBucketId = bucketSyncRepository.updateBucketDynamic(
+            bucketId,
             buffer.readByteArray(),
-            sortKey = (fileMetadata.orderIndex * BUCKET_ID_MULTIPLIER).toLong(),
+            sortKey = (fileMetadata.orderIndex * BUCKET_ID_MULTIPLIER + indexIncludingFirst).toLong(),
+            flags = 1u,
+            groupId = fileIdString,
          )
-      } else {
-         bucketSyncRepository.deleteBucketDynamic((id * BUCKET_ID_MULTIPLIER).toString())
+         savedBuckets.add(bucketId)
       }
+
+      val buffer = Buffer()
+
+      buffer.write(encodedTitle)
+      buffer.writeByte(0)
+      buffer.writeByte(nextBucketId)
+      buffer.write(firstBucketTextBody)
+
+      bucketSyncRepository.updateBucketDynamic(
+         (fileMetadata.id * BUCKET_ID_MULTIPLIER).toString(),
+         buffer.readByteArray(),
+         sortKey = (fileMetadata.orderIndex * BUCKET_ID_MULTIPLIER).toLong(),
+         groupId = fileIdString,
+         flags = 0u,
+      )
+
+      logcat { "Written buckets $savedBuckets" }
+      bucketSyncRepository.deleteGroup(fileIdString, except = savedBuckets)
    }
 
    suspend fun init() {

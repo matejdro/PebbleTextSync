@@ -6,6 +6,8 @@ import com.matejdro.bucketsync.api.BucketUpdate
 import com.matejdro.pebbletextsync.bluetooth.util.FileContentsReader
 import com.matejdro.pebbletextsync.files.FakeSyncingFileRepository
 import com.matejdro.pebbletextsync.files.SyncingFile
+import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.TestScope
@@ -60,6 +62,8 @@ class WatchSyncerImplTest {
                   'e'.code.toByte(),
                   0,
 
+                  0, // ID of the next bucket (null in this case)
+
                   // UTF8 Bytes for the body, NOT followed by null terminator
                   'S'.code.toByte(),
                   'h'.code.toByte(),
@@ -96,9 +100,10 @@ class WatchSyncerImplTest {
                   'l'.code.toByte(),
                   'e'.code.toByte(),
                   0,
+                  0, // ID of the next bucket (null in this case)
                ) +
                   // A character, repeated until the end of the bucket
-                  ByteArray(255 - 6) { 'A'.code.toByte() },
+                  ByteArray(255 - 7) { 'A'.code.toByte() },
             )
          )
       )
@@ -125,6 +130,7 @@ class WatchSyncerImplTest {
                   byteArrayOf(
                      // Null terminator
                      0,
+                     0, // ID of the next bucket (null in this case)
                      // UTF8 Bytes for the body, NOT followed by null terminator
                      'S'.code.toByte(),
                      'h'.code.toByte(),
@@ -189,6 +195,128 @@ class WatchSyncerImplTest {
          2u,
          listOf(1u, 2u),
          listOf(Bucket(2u, ByteArray(0)), Bucket(1u, ByteArray(0)))
+      )
+   }
+
+   @Test
+   fun `Sync a file into two buckets`() = scope.runTest {
+      standardInit()
+
+      fileRepo.insert(
+         SyncingFile("Title", "content://2", slots = 2),
+      )
+      watchSyncer.syncFile(1)
+      delay(1.seconds)
+
+      bucketsyncRepo.checkForNextUpdate(0u, emptyList()) shouldBe BucketUpdate(
+         2u,
+         listOf(2u, 1u),
+         listOf(
+            Bucket(
+               1u,
+               // A character, repeated for the entire bucket
+               byteArrayOf(
+                  0, // ID of the next bucket (null in this case)
+               ) +
+                  ByteArray(254) { 'A'.code.toByte() },
+            ),
+            Bucket(
+               2u,
+               byteArrayOf(
+                  // UTF8 Bytes for the title, followed by null terminator
+                  'T'.code.toByte(),
+                  'i'.code.toByte(),
+                  't'.code.toByte(),
+                  'l'.code.toByte(),
+                  'e'.code.toByte(),
+                  0,
+                  1, // ID of the next bucket
+               ) +
+                  // A character, repeated until the end of the bucket
+                  ByteArray(255 - 7) { 'A'.code.toByte() }
+            ),
+         ),
+         activeBucketFlags = listOf(
+            0u, // First bucket of the file
+            1u // Subsequent bucket of the file
+         )
+      )
+   }
+
+   @Test
+   fun `Delete excess buckets after reducing number of slots`() = scope.runTest {
+      standardInit()
+
+      fileRepo.insert(
+         SyncingFile("Title", "content://2", slots = 2),
+      )
+      watchSyncer.syncFile(1)
+      delay(1.seconds)
+
+      fileRepo.update(
+         SyncingFile("Title", "content://2", slots = 1, id = 1),
+      )
+      watchSyncer.syncFile(1)
+      delay(1.seconds)
+
+      bucketsyncRepo.checkForNextUpdate(0u, emptyList()) shouldBe BucketUpdate(
+         4u,
+         listOf(2u),
+         listOf(
+            Bucket(
+               2u,
+               byteArrayOf(
+                  // UTF8 Bytes for the title, followed by null terminator
+                  'T'.code.toByte(),
+                  'i'.code.toByte(),
+                  't'.code.toByte(),
+                  'l'.code.toByte(),
+                  'e'.code.toByte(),
+                  0,
+                  0, // ID of the next bucket
+               ) +
+                  // A character, repeated until the end of the bucket
+                  ByteArray(255 - 7) { 'A'.code.toByte() }
+            ),
+         ),
+         activeBucketFlags = listOf(
+            0u, // First bucket of the file
+         )
+      )
+   }
+
+   @Test
+   fun `Do not use multiple buckets if the file is shorter than allowed slots`() = scope.runTest {
+      standardInit()
+
+      fileRepo.insert(
+         SyncingFile("Title", "content://1", slots = 3),
+      )
+
+      watchSyncer.syncFile(1)
+      delay(1.seconds)
+
+      bucketsyncRepo.checkForNextUpdate(0u, emptyList()).shouldNotBeNull()
+         .activeBuckets
+         .shouldContainExactly(1u)
+   }
+
+   @Test
+   fun `Delete all buckets when deleting a file`() = scope.runTest {
+      standardInit()
+
+      fileRepo.insert(SyncingFile("Title", "content://2", slots = 3))
+      watchSyncer.syncFile(1)
+      delay(1.seconds)
+
+      fileRepo.delete(1)
+      watchSyncer.syncFile(1)
+      delay(1.seconds)
+
+      bucketsyncRepo.checkForNextUpdate(1u, emptyList()) shouldBe BucketUpdate(
+         4u,
+         emptyList(),
+         emptyList(),
       )
    }
 

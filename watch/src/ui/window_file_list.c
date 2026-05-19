@@ -216,7 +216,14 @@ static void load_menu()
     uint8_t count = 0;
     for (uint8_t i = 0; i < buckets->count; i++)
     {
-        const BucketMetadata bucket = buckets->data[count];
+        const BucketMetadata bucket = buckets->data[i];
+
+        if ((bucket.flags & 0x01) != 0)
+        {
+            // Bucket is extra text bucket
+            continue;
+        }
+
         uint8_t tmp_data[20];
         if (!bucket_sync_load_bucket_limited(bucket.id, tmp_data, 20))
         {

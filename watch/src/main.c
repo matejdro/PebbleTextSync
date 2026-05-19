@@ -4,7 +4,7 @@
 #include "connection/packets.h"
 #include "ui/window_file_list.h"
 
-const uint16_t PROTOCOL_VERSION = 1;
+const uint16_t PROTOCOL_VERSION = 2;
 
 int main(void)
 {

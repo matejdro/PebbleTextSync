@@ -71,7 +71,18 @@ Every bucket is stored in the `2001` - `2015` storage keys.
 
 ## First file packet
 
+Packet that contains a title + initial body of a file. Its recognised by having `0x1` flag set to `0`.
+
 Bucket data:
 
 * File name (string, up to 20 bytes + null terminator)
+* ID of the next bucket that contains more text, or 0 (uint8)
 * text (string, up to 253 bytes, depending on how much space was already taken by the title). No null terminator (end of bucket functions as the end of string)
+  
+## Extra text packet
+
+Packet that contains extra text of a file. Its recognised by having `0x1` flag set to `1`.
+
+Bucket data:
+* ID of the next bucket that contains more text, or 0 (uint8)
+* text (string, up to 254 bytes). No null terminator (end of bucket functions as the end of string)
