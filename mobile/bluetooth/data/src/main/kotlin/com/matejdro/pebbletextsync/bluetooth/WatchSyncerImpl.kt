@@ -18,6 +18,7 @@ import si.inova.kotlinova.core.outcome.Outcome
 import si.inova.kotlinova.core.reporting.ErrorReporter
 import java.nio.ByteBuffer
 import java.nio.CharBuffer
+import java.nio.charset.CoderResult
 import java.nio.charset.StandardCharsets
 
 @ContributesBinding(AppScope::class)
@@ -30,7 +31,6 @@ class WatchSyncerImpl(
    private val stringEncoder = LimitingStringEncoder()
    private val utf8Encoder = StandardCharsets.UTF_8.newEncoder()
 
-   @Suppress("MissingUseCall") // Buffer does not need closing
    override suspend fun syncFile(id: Int) = withDefault {
       logcat { "Syncing file $id" }
       val fileMetadataOutcome = fileRepository.getSingle(id).first()
@@ -61,25 +61,24 @@ class WatchSyncerImpl(
 
       byteBuffer.position(encodedTitle.size + 1)
       val firstBucketResult = utf8Encoder.encode(contentBuffer, byteBuffer, true)
-      val firstBucketTextBody = byteBuffer.array().copyOfRange(encodedTitle.size + 1, byteBuffer.position())
+      val firstBucketTextBody = byteBuffer.array().copyOfRange(fromIndex = encodedTitle.size + 1, toIndex = byteBuffer.position())
 
-      val extraTextBodies = buildList {
-         if (!firstBucketResult.isUnderflow) {
-            byteBuffer.rewind()
+      val extraTextBodies = getExtraTextBodies(firstBucketResult, byteBuffer, fileMetadata, contentBuffer)
 
-            var bucketsLeft = fileMetadata.slots
-            while (--bucketsLeft > 0) {
-               val result = utf8Encoder.encode(contentBuffer, byteBuffer, true)
-               add(byteBuffer.array().copyOfRange(0, byteBuffer.position()))
-               if (result.isUnderflow) {
-                  break
-               }
+      val savedBuckets = saveBuckets(fileMetadata, extraTextBodies, fileIdString, encodedTitle, firstBucketTextBody)
 
-               byteBuffer.rewind()
-            }
-         }
-      }
+      logcat { "Written buckets $savedBuckets" }
+      bucketSyncRepository.deleteGroup(fileIdString, except = savedBuckets)
+   }
 
+   @Suppress("MissingUseCall") // Buffer does not need closing
+   private suspend fun saveBuckets(
+      fileMetadata: SyncingFile,
+      extraTextBodies: List<ByteArray>,
+      fileIdString: String,
+      encodedTitle: ByteArray,
+      firstBucketTextBody: ByteArray,
+   ): MutableList<String> {
       // Update buckets in reverse order to get the ids of the next bucket in the sequence
       var nextBucketId = 0
 
@@ -118,9 +117,29 @@ class WatchSyncerImpl(
          groupId = fileIdString,
          flags = 0u,
       )
+      return savedBuckets
+   }
 
-      logcat { "Written buckets $savedBuckets" }
-      bucketSyncRepository.deleteGroup(fileIdString, except = savedBuckets)
+   private fun getExtraTextBodies(
+      firstBucketResult: CoderResult,
+      byteBuffer: ByteBuffer,
+      fileMetadata: SyncingFile,
+      contentBuffer: CharBuffer?,
+   ): List<ByteArray> = buildList {
+      if (!firstBucketResult.isUnderflow) {
+         byteBuffer.rewind()
+
+         var bucketsLeft = fileMetadata.slots
+         while (--bucketsLeft > 0) {
+            val result = utf8Encoder.encode(contentBuffer, byteBuffer, true)
+            add(byteBuffer.array().copyOfRange(fromIndex = 0, toIndex = byteBuffer.position()))
+            if (result.isUnderflow) {
+               break
+            }
+
+            byteBuffer.rewind()
+         }
+      }
    }
 
    suspend fun init() {
