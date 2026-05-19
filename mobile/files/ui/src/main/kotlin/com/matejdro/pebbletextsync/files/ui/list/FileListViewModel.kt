@@ -2,6 +2,7 @@ package com.matejdro.pebbletextsync.files.ui.list
 
 import android.net.Uri
 import androidx.compose.runtime.Stable
+import com.matejdro.pebble.bluetooth.common.util.LimitingStringEncoder
 import com.matejdro.pebbletextsync.common.logging.ActionLogger
 import com.matejdro.pebbletextsync.files.SyncingFile
 import com.matejdro.pebbletextsync.files.SyncingFileRepository
@@ -50,7 +51,12 @@ class FileListViewModel(
 
       val addedFileId = withDefault {
          val fileName = fileOpenPreprocessor.resolvePermissionsAndGetFileName(uri)
-         syncingFileRepository.insert(SyncingFile(title = fileName, contentUri = uri.toString()))
+         val limitedFileName = String(
+            LimitingStringEncoder()
+               .encodeSizeLimited(fileName, SyncingFile.MAX_TITLE_LENGTH_BYTES, ellipsize = false)
+               .encodedString
+         )
+         syncingFileRepository.insert(SyncingFile(title = limitedFileName, contentUri = uri.toString()))
       }
 
       navigator.navigate(OpenScreenOrReplaceExistingType(FileDetailsScreenKey(addedFileId)))

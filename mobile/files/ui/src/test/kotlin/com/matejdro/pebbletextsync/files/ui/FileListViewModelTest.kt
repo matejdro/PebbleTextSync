@@ -21,8 +21,12 @@ class FileListViewModelTest {
    private val navigator = FakeNavigator(FileListScreenKey)
 
    private val fileOpenPreprocessor = FileOpenPreprocessor { uri ->
-      if (uri.toString() == "content://test_file") {
+      val uriString = uri.toString()
+
+      if (uriString == "content://test_file") {
          "File name"
+      } else if (uriString == "content://long_file") {
+         "Looooooooooooooooooong file name"
       } else {
          throw UnsupportedOperationException("Unknown file $uri")
       }
@@ -68,5 +72,19 @@ class FileListViewModelTest {
             )
          )
       )
+   }
+
+   @Test
+   fun `Trim long file names`() = scope.runTest {
+      viewModel.addFile("content://long_file".toUri())
+      runCurrent()
+
+      syncingFileRepository.getAll().first().shouldBeSuccessWithData(
+         listOf(
+            SyncingFile("Looooooooooooooooooo", "content://long_file", id = 1, orderIndex = 0)
+         )
+      )
+
+      navigator.backstack.shouldContainExactly(FileListScreenKey, FileDetailsScreenKey(1))
    }
 }

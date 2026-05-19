@@ -41,8 +41,9 @@ class WatchSyncerImpl(
 
          val buffer = Buffer()
 
-         val encodedTitle = stringEncoder.encodeSizeLimited(fileMetadata.title, SyncingFile.MAX_TITLE_LENGTH, ellipsize = false)
-            .encodedString
+         val encodedTitle =
+            stringEncoder.encodeSizeLimited(fileMetadata.title, SyncingFile.MAX_TITLE_LENGTH_BYTES, ellipsize = false)
+               .encodedString
 
          buffer.write(encodedTitle)
          buffer.writeByte(0)

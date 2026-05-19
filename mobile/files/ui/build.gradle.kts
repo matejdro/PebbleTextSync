@@ -16,6 +16,7 @@ android {
 dependencies {
    api(projects.files.api)
 
+   implementation(projects.bluetoothCommon)
    implementation(projects.common)
    implementation(projects.commonCompose)
    implementation(libs.androidx.activity.compose)

@@ -1,0 +1,33 @@
+package com.matejdro.pebbletextsync.files.ui.details.util
+
+import androidx.compose.foundation.text.input.InputTransformation
+import androidx.compose.foundation.text.input.TextFieldBuffer
+import androidx.compose.foundation.text.input.delete
+import androidx.compose.foundation.text.input.placeCursorAtEnd
+import java.nio.ByteBuffer
+import java.nio.CharBuffer
+import java.nio.charset.StandardCharsets
+
+class MaxStringSizeBytesInputTransformation(private val maxBytes: Int) : InputTransformation {
+   private val buffer = ByteBuffer.allocate(maxBytes)
+
+   private val utf8Encoder = StandardCharsets.UTF_8.newEncoder()
+   private val utf8Decoder = StandardCharsets.UTF_8.newDecoder()
+   override fun TextFieldBuffer.transformInput() {
+      val trimmedString = trim(this.toString())
+
+      if (length > trimmedString.length) {
+         this.delete(start = trimmedString.length, end = length)
+         this.placeCursorAtEnd()
+      }
+   }
+
+   fun trim(text: String): String {
+      val charBuffer = CharBuffer.wrap(text)
+      utf8Encoder.encode(charBuffer, buffer, true)
+      buffer.rewind()
+      val newLength = utf8Decoder.decode(buffer).toString().length
+
+      return text.take(newLength)
+   }
+}

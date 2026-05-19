@@ -33,6 +33,7 @@ import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import com.matejdro.pebbletextsync.files.SyncingFile
 import com.matejdro.pebbletextsync.files.ui.FileDetailsScreenKey
 import com.matejdro.pebbletextsync.files.ui.R
+import com.matejdro.pebbletextsync.files.ui.details.util.MaxStringSizeBytesInputTransformation
 import com.matejdro.pebbletextsync.files.ui.errors.filesUserFriendlyMessage
 import com.matejdro.pebbletextsync.ui.components.ProgressErrorSuccessScaffold
 import com.matejdro.pebbletextsync.ui.debugging.FullScreenPreviews
@@ -83,7 +84,13 @@ private fun FileDetailsScreenContent(
          .padding(8.dp)
    ) {
       val titleState = rememberTextFieldState(state.file.title)
-      TextField(titleState, label = { Text(stringResource(R.string.name)) }, modifier = Modifier.fillMaxWidth())
+      val inputTransformation = remember { MaxStringSizeBytesInputTransformation(SyncingFile.MAX_TITLE_LENGTH_BYTES) }
+      TextField(
+         titleState,
+         label = { Text(stringResource(R.string.name)) },
+         modifier = Modifier.fillMaxWidth(),
+         inputTransformation = inputTransformation
+      )
 
       LaunchedEffect(titleState.text) {
          editName(titleState.text.toString())
