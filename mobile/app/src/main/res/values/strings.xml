@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">TextSync for Pebble</string>
+    <string name="channel_errors">Errors</string>
+    <string name="channel_background_work">Background work</string>
 </resources>

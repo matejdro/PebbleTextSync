@@ -6,8 +6,10 @@ import com.matejdro.pebble.common.logging.FileLoggingController
 import com.matejdro.pebble.common.logging.TinyLogLoggingThread
 import com.matejdro.pebbletextsync.MainViewModel
 import com.matejdro.pebbletextsync.bluetooth.WatchSyncerImpl
+import com.matejdro.pebbletextsync.navigation.NavigationInjectingGraph
 import com.matejdro.pebbletextsync.navigation.scenes.ListDetailScene
 import com.matejdro.pebbletextsync.receiving.PebbleListenerService
+import com.matejdro.pebbletextsync.tasker.TaskerServiceInjector
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.DependencyGraph
 import dev.zacsweers.metro.Provides
@@ -31,12 +33,12 @@ interface MainApplicationGraph : ApplicationGraph {
 }
 
 @Suppress("ComplexInterface") // DI
-interface ApplicationGraph {
+interface ApplicationGraph : TaskerServiceInjector, NavigationInjectingGraph {
    fun getErrorReporter(): ErrorReporter
    fun getDefaultCoroutineScope(): DefaultCoroutineScope
-   fun getNavigationInjectionFactory(): NavigationInjection.Factory
+   override fun getNavigationInjectionFactory(): NavigationInjection.Factory
    fun getMainDeepLinkHandler(): MainDeepLinkHandler
-   fun getNavigationContext(): NavigationContext
+   override fun getNavigationContext(): NavigationContext
    fun getDateFormatter(): AndroidDateTimeFormatter
    fun getMainViewModelFactory(): MainViewModel.Factory
    fun getListDetailSceneFactory(): ListDetailScene.Factory

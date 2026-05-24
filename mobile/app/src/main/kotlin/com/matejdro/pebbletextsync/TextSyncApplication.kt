@@ -24,6 +24,9 @@ import com.matejdro.pebble.common.logging.TinyLogLogcatLogger
 import com.matejdro.pebbletextsync.di.ApplicationGraph
 import com.matejdro.pebbletextsync.di.MainApplicationGraph
 import com.matejdro.pebbletextsync.logging.ErrorReportingKermitWriter
+import com.matejdro.pebbletextsync.navigation.NavigationInjectingApplication
+import com.matejdro.pebbletextsync.notifications.NotificationChannelManager
+import com.matejdro.pebbletextsync.tasker.TaskerInjectingApplication
 import com.matejdro.pebbletextsync.ui.theme.TextSyncTheme
 import dev.zacsweers.metro.createGraphFactory
 import dispatch.core.DefaultDispatcherProvider
@@ -37,8 +40,12 @@ import si.inova.kotlinova.core.dispatchers.AccessCallbackDispatcherProvider
 import java.io.File
 import co.touchlab.kermit.Logger as KermitLogger
 
-open class TextSyncApplication : Application(), CrashWindowThemeProvider {
-   open val applicationGraph: ApplicationGraph by lazy {
+open class TextSyncApplication :
+   Application(),
+   CrashWindowThemeProvider,
+   TaskerInjectingApplication,
+   NavigationInjectingApplication {
+   override val applicationGraph: ApplicationGraph by lazy {
       createGraphFactory<MainApplicationGraph.Factory>().create(this)
    }
 
@@ -86,6 +93,8 @@ open class TextSyncApplication : Application(), CrashWindowThemeProvider {
             .interceptorCoroutineContext(applicationGraph.getDefaultCoroutineScope().defaultDispatcher)
             .build()
       }
+
+      NotificationChannelManager(this).createChannels()
 
       WorkManager.initialize(
          this,
