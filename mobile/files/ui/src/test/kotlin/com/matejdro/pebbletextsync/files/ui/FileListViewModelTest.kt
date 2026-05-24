@@ -1,12 +1,15 @@
 package com.matejdro.pebbletextsync.files.ui
 
 import androidx.core.net.toUri
+import com.matejdro.pebbletextsync.bluetooth.FakeWatchSyncer
 import com.matejdro.pebbletextsync.files.FakeSyncingFileRepository
 import com.matejdro.pebbletextsync.files.SyncingFile
 import com.matejdro.pebbletextsync.files.ui.list.FileListState
 import com.matejdro.pebbletextsync.files.ui.list.FileListViewModel
 import com.matejdro.pebbletextsync.files.ui.list.util.FileOpenPreprocessor
 import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -15,6 +18,7 @@ import si.inova.kotlinova.core.test.TestScopeWithDispatcherProvider
 import si.inova.kotlinova.core.test.outcomes.shouldBeSuccessWithData
 import si.inova.kotlinova.core.test.outcomes.testCoroutineResourceManager
 import si.inova.kotlinova.navigation.test.FakeNavigator
+import kotlin.time.Duration.Companion.seconds
 
 class FileListViewModelTest {
    private val scope = TestScopeWithDispatcherProvider()
@@ -34,12 +38,15 @@ class FileListViewModelTest {
 
    private val syncingFileRepository = FakeSyncingFileRepository()
 
+   private val syncer = FakeWatchSyncer()
+
    private val viewModel = FileListViewModel(
       resources = scope.testCoroutineResourceManager(),
       actionLogger = { },
       fileOpenPreprocessor = fileOpenPreprocessor,
       syncingFileRepository = syncingFileRepository,
       navigator = navigator,
+      watchSyncer = syncer,
    )
 
    @Test
@@ -69,7 +76,8 @@ class FileListViewModelTest {
             listOf(
                SyncingFile("File A", "content://files/A", orderIndex = 0, id = 1, slots = 3),
                SyncingFile("File B", "content://files/B", orderIndex = 1, id = 2, slots = 1)
-            )
+            ),
+            syncing = false
          )
       )
    }
@@ -104,8 +112,43 @@ class FileListViewModelTest {
             listOf(
                SyncingFile("File B", "content://files/B", orderIndex = 0, id = 2, slots = 1),
                SyncingFile("File A", "content://files/A", orderIndex = 1, id = 1, slots = 3),
-            )
+            ),
+            syncing = false,
          )
       )
+   }
+
+   @Test
+   fun `Sync all`() = scope.runTest {
+      syncingFileRepository.insert(SyncingFile("File A", "content://files/A", slots = 3))
+      syncingFileRepository.insert(SyncingFile("File B", "content://files/B"))
+
+      viewModel.onServiceRegistered()
+      runCurrent()
+
+      viewModel.syncAll()
+      runCurrent()
+
+      syncer.syncAllCalled shouldBe true
+   }
+
+   @Test
+   fun `Syncing should be set to true until sync completes`() = scope.runTest {
+      syncingFileRepository.insert(SyncingFile("File A", "content://files/A", slots = 3))
+      syncingFileRepository.insert(SyncingFile("File B", "content://files/B"))
+
+      viewModel.onServiceRegistered()
+      runCurrent()
+
+      syncer.blockSyncing.value = true
+      viewModel.syncAll()
+      runCurrent()
+
+      viewModel.uiState.value.data!!.syncing shouldBe true
+
+      syncer.blockSyncing.value = false
+      delay(2.seconds)
+
+      viewModel.uiState.value.data!!.syncing shouldBe false
    }
 }

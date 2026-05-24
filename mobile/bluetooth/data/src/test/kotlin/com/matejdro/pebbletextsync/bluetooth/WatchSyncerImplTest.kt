@@ -320,6 +320,30 @@ class WatchSyncerImplTest {
       )
    }
 
+   @Test
+   fun `Sync all files on syncAll call`() = scope.runTest {
+      fileRepo.insert(SyncingFile("Title", "content://1"))
+      fileRepo.insert(SyncingFile("Title 2", "content://1"))
+      runCurrent()
+
+      val watchSyncer = WatchSyncerImpl(
+         bucketsyncRepo,
+         fileRepo,
+         fileReader,
+         {},
+      )
+
+      watchSyncer.init()
+      watchSyncer.syncAll()
+      delay(1.seconds)
+
+      bucketsyncRepo.checkForNextUpdate(1u, emptyList())?.emptyBucketData() shouldBe BucketUpdate(
+         2u,
+         listOf(1u, 2u),
+         listOf(Bucket(2u, ByteArray(0)), Bucket(1u, ByteArray(0)))
+      )
+   }
+
    private suspend fun standardInit() {
       watchSyncer.init()
    }

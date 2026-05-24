@@ -146,15 +146,19 @@ class WatchSyncerImpl(
       val existingDataValid = bucketSyncRepository.init(BUCKET_DATA_VERSION.toInt())
 
       if (!existingDataValid) {
-         val existingBucketsOutcome = fileRepository.getAll().first()
-         if (existingBucketsOutcome !is Outcome.Success) {
-            errorReporter.report(UnknownCauseException("Got non-success on file syncing: $existingBucketsOutcome"))
-            return
-         }
+         syncAll()
+      }
+   }
 
-         for (bucket in existingBucketsOutcome.data) {
-            syncFile(bucket.id)
-         }
+   override suspend fun syncAll() {
+      val existingBucketsOutcome = fileRepository.getAll().first()
+      if (existingBucketsOutcome !is Outcome.Success) {
+         errorReporter.report(UnknownCauseException("Got non-success on file syncing: $existingBucketsOutcome"))
+         return
+      }
+
+      for (bucket in existingBucketsOutcome.data) {
+         syncFile(bucket.id)
       }
    }
 }

@@ -1,17 +1,29 @@
 package com.matejdro.pebbletextsync.files.ui.list
 
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
+import androidx.compose.material3.pulltorefresh.pullToRefresh
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
@@ -49,6 +61,9 @@ class FileListScreen(
          stateOutcome::value,
          errorProgressModifier = Modifier.safeDrawingPadding()
       ) { state ->
+         val context = LocalContext.current
+         val resources = LocalResources.current
+
          FileListScreenContent(
             state,
             addNewFile = {
@@ -57,7 +72,16 @@ class FileListScreen(
             reorder = viewModel::reorder,
             openDetails = {
                navigator.navigate(OpenScreenOrReplaceExistingType(FileDetailsScreenKey(it)))
-            }
+            },
+            sync = {
+               viewModel.syncAll()
+
+               Toast.makeText(
+                  context,
+                  resources.getString(R.string.refreshing_file_contents),
+                  Toast.LENGTH_SHORT
+               ).show()
+            },
          )
       }
    }
@@ -69,6 +93,7 @@ private fun FileListScreenContent(
    addNewFile: () -> Unit,
    openDetails: (id: Int) -> Unit,
    reorder: (id: Int, toIndex: Int) -> Unit,
+   sync: () -> Unit,
 ) {
    Scaffold(
       floatingActionButton = {
@@ -79,19 +104,38 @@ private fun FileListScreenContent(
    ) { scaffoldPadding ->
       val listState = rememberLazyListState()
       ReorderableListContainer(state.files, listState) { items ->
-         LazyColumn(contentPadding = scaffoldPadding, state = listState) {
-            itemsWithDivider(items, key = { it.id }) { file ->
-               ReorderableListItem(file.id, file, setOrder = reorder) { modifier, _ ->
-                  Text(
-                     file.title,
-                     modifier
-                        .padding(32.dp)
-                        .fillMaxWidth()
-                        .animateItem()
-                        .clickable(onClick = { openDetails(file.id) })
-                  )
+         val topWindowOffset = WindowInsets.safeDrawing.asPaddingValues().calculateTopPadding()
+         val refreshState = rememberPullToRefreshState()
+
+         Box(
+            Modifier.pullToRefresh(
+               isRefreshing = state.syncing,
+               onRefresh = sync,
+               threshold = topWindowOffset + 48.dp,
+               state = refreshState,
+            )
+         ) {
+            LazyColumn(contentPadding = scaffoldPadding, state = listState, modifier = Modifier.fillMaxSize()) {
+               itemsWithDivider(items, key = { it.id }) { file ->
+                  ReorderableListItem(file.id, file, setOrder = reorder) { modifier, _ ->
+                     Text(
+                        file.title,
+                        modifier
+                           .padding(32.dp)
+                           .fillMaxWidth()
+                           .animateItem()
+                           .clickable(onClick = { openDetails(file.id) })
+                     )
+                  }
                }
             }
+
+            PullToRefreshDefaults.Indicator(
+               state = refreshState,
+               modifier = Modifier.align(Alignment.TopCenter),
+               isRefreshing = state.syncing,
+               maxDistance = topWindowOffset + 48.dp,
+            )
          }
       }
    }
@@ -107,11 +151,13 @@ internal fun FileListScreenContentPreview() {
             listOf(
                SyncingFile("File A", ""),
                SyncingFile("File B", ""),
-            )
+            ),
+            syncing = false,
          ),
          addNewFile = {},
          openDetails = {},
-         reorder = { _, _ -> }
+         reorder = { _, _ -> },
+         sync = {},
       )
    }
 }

@@ -4,5 +4,5 @@ plugins {
 }
 
 dependencies {
-
+   testFixturesApi(libs.kotlin.coroutines)
 }

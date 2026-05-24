@@ -16,6 +16,7 @@ android {
 dependencies {
    api(projects.files.api)
 
+   implementation(projects.bluetooth.api)
    implementation(projects.bluetoothCommon)
    implementation(projects.common)
    implementation(projects.commonCompose)
@@ -30,5 +31,6 @@ dependencies {
    testImplementation(libs.kotlin.coroutines.test)
    testImplementation(libs.kotlinova.core.test)
    testImplementation(libs.kotlinova.navigation.test)
+   testImplementation(testFixtures(projects.bluetooth.api))
    testImplementation(testFixtures(projects.files.api))
 }
