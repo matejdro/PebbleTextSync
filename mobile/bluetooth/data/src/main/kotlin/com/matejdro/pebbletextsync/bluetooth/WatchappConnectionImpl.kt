@@ -1,5 +1,7 @@
 package com.matejdro.pebbletextsync.bluetooth
 
+import com.matejdro.bucketsync.BucketSyncRepository.Companion.MAX_BUCKETS_CORE_WATCHES
+import com.matejdro.bucketsync.BucketSyncRepository.Companion.MAX_BUCKETS_LEGACY_WATCHES
 import com.matejdro.bucketsync.BucketSyncWatchLoop
 import com.matejdro.bucketsync.BucketSyncWatchappOpenController
 import com.matejdro.pebble.bluetooth.common.PacketQueue
@@ -10,11 +12,14 @@ import com.matejdro.pebble.bluetooth.common.util.requireUint
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.Inject
+import io.rebble.pebblekit2.client.PebbleInfoRetriever
 import io.rebble.pebblekit2.common.model.PebbleDictionary
 import io.rebble.pebblekit2.common.model.PebbleDictionaryItem
 import io.rebble.pebblekit2.common.model.ReceiveResult
 import io.rebble.pebblekit2.common.model.WatchIdentifier
+import io.rebble.pebblekit2.model.ConnectedWatch
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import logcat.logcat
 
@@ -26,6 +31,8 @@ class WatchappConnectionImpl(
    private val packetQueue: PacketQueue,
    private val bucketSyncWatchLoop: BucketSyncWatchLoop,
    private val openController: BucketSyncWatchappOpenController,
+   private val pebbleInfoRetriever: PebbleInfoRetriever,
+   private val watch: WatchIdentifier,
 ) : WatchAppConnection {
 
    init {
@@ -47,6 +54,8 @@ class WatchappConnectionImpl(
    }
 
    private suspend fun processWatchWelcomePacket(data: PebbleDictionary): ReceiveResult {
+      val watchInfo = pebbleInfoRetriever.getConnectedWatches().first().firstOrNull { it.id == watch }
+
       val watchProtocolVersion = data.requireUint(1u)
       if (watchProtocolVersion != PROTOCOL_VERSION.toUInt()) {
          logcat { "Mismatch protocol version $watchProtocolVersion" }
@@ -79,6 +88,11 @@ class WatchappConnectionImpl(
          watchVersion,
          watchBufferSize,
          currentlyActiveBuckets = activeBuckets,
+         maxActiveBuckets = if (watchInfo?.supportsLargeStorage() == true) {
+            MAX_BUCKETS_CORE_WATCHES
+         } else {
+            MAX_BUCKETS_LEGACY_WATCHES
+         },
       )
 
       return ReceiveResult.Ack
@@ -97,3 +111,8 @@ class WatchappConnectionImpl(
 
 private fun <K, V> mapOfNotNull(vararg pairs: Pair<K, V>?): Map<K, V> =
    pairs.filterNotNull().toMap()
+
+@Suppress("MagicNumber") // Just a hardcoded firmware version
+private fun ConnectedWatch.supportsLargeStorage(): Boolean {
+   return firmwareVersionMajor > 4 || firmwareVersionMinor > 9 || firmwareVersionPatch >= 171
+}

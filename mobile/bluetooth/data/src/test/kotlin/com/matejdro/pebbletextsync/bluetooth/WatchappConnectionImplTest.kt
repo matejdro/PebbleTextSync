@@ -12,6 +12,7 @@ import io.kotest.matchers.shouldBe
 import io.rebble.pebblekit2.common.model.PebbleDictionaryItem
 import io.rebble.pebblekit2.common.model.ReceiveResult
 import io.rebble.pebblekit2.common.model.WatchIdentifier
+import io.rebble.pebblekit2.model.ConnectedWatch
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
@@ -30,6 +31,8 @@ class WatchappConnectionImplTest {
 
    private val packetQueue = PacketQueue(sender, watch, WATCHAPP_UUID)
 
+   private val pebbleInfoRetriever = FakePebbleInfoRetriever()
+
    private val bucketSyncWatchLoop = BucketSyncWatchLoopImpl(
       scope.backgroundScope,
       packetQueue,
@@ -44,6 +47,8 @@ class WatchappConnectionImplTest {
       packetQueue,
       bucketSyncWatchLoop,
       watchappOpenController,
+      pebbleInfoRetriever,
+      watch,
    )
 
    @Test
@@ -128,6 +133,105 @@ class WatchappConnectionImplTest {
       runCurrent()
 
       sender.sentData.first().shouldContainKey(3u)
+   }
+
+   @Test
+   fun `Report max buckets as 15 on legacy watches`() = scope.runTest {
+      pebbleInfoRetriever.setConnectedWatches(
+         listOf(
+            ConnectedWatch(
+               id = watch,
+               name = "",
+               platform = "",
+               revision = "",
+               firmwareVersionMajor = 4,
+               firmwareVersionMinor = 4,
+               firmwareVersionPatch = 3,
+               firmwareVersionTag = ""
+            ),
+            ConnectedWatch(
+               id = WatchIdentifier("Another watch"),
+               name = "",
+               platform = "",
+               revision = "",
+               firmwareVersionMajor = 10,
+               firmwareVersionMinor = 0,
+               firmwareVersionPatch = 0,
+               firmwareVersionTag = ""
+            ),
+         )
+      )
+
+      receiveStandardHelloPacket(bufferSize = 38u)
+      runCurrent()
+
+      bucketSyncWatchLoop.lastMaxActiveBuckets shouldBe 15
+   }
+
+   @Test
+   fun `Report max buckets as 15 on core watches with older firmware`() = scope.runTest {
+      pebbleInfoRetriever.setConnectedWatches(
+         listOf(
+            ConnectedWatch(
+               id = watch,
+               name = "",
+               platform = "",
+               revision = "",
+               firmwareVersionMajor = 4,
+               firmwareVersionMinor = 9,
+               firmwareVersionPatch = 163,
+               firmwareVersionTag = ""
+            ),
+            ConnectedWatch(
+               id = WatchIdentifier("Another watch"),
+               name = "",
+               platform = "",
+               revision = "",
+               firmwareVersionMajor = 10,
+               firmwareVersionMinor = 0,
+               firmwareVersionPatch = 0,
+               firmwareVersionTag = ""
+            ),
+         )
+      )
+
+      receiveStandardHelloPacket(bufferSize = 38u)
+      runCurrent()
+
+      bucketSyncWatchLoop.lastMaxActiveBuckets shouldBe 15
+   }
+
+   @Test
+   fun `Report max buckets as 255 on core watches with the new firmware`() = scope.runTest {
+      pebbleInfoRetriever.setConnectedWatches(
+         listOf(
+            ConnectedWatch(
+               id = watch,
+               name = "",
+               platform = "",
+               revision = "",
+               firmwareVersionMajor = 4,
+               firmwareVersionMinor = 9,
+               firmwareVersionPatch = 171,
+               firmwareVersionTag = ""
+            ),
+            ConnectedWatch(
+               id = WatchIdentifier("Another watch"),
+               name = "",
+               platform = "",
+               revision = "",
+               firmwareVersionMajor = 10,
+               firmwareVersionMinor = 0,
+               firmwareVersionPatch = 0,
+               firmwareVersionTag = ""
+            ),
+         )
+      )
+
+      receiveStandardHelloPacket(bufferSize = 38u)
+      runCurrent()
+
+      bucketSyncWatchLoop.lastMaxActiveBuckets shouldBe 255
    }
 
    private suspend fun receiveStandardHelloPacket(

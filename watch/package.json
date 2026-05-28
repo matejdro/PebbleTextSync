@@ -15,6 +15,7 @@
     "targetPlatforms": [
       "basalt",
       "diorite",
+      "flint",
       "emery"
     ],
     "watchapp": {
