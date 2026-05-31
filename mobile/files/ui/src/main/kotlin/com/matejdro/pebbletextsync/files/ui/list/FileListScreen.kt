@@ -149,8 +149,8 @@ internal fun FileListScreenContentPreview() {
       FileListScreenContent(
          state = FileListState(
             listOf(
-               SyncingFile("File A", ""),
-               SyncingFile("File B", ""),
+               SyncingFile("File A", "", id = 0),
+               SyncingFile("File B", "", id = 1),
             ),
             syncing = false,
          ),
