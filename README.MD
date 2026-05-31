@@ -36,6 +36,28 @@ On the text screen:
 * Single click / hold DOWN - Scroll text down
 * Single click / hold UP - Scroll text up
 
+## On the phone
+
+### Adding files
+
+To add a new file to syncing, simply press the + button on the landing page of the app and select your file.
+
+Note: you must select the file from its actual place on the storage. Selecting it from "Recents" will not work.
+
+### Slots
+
+The watch can only store a limited amount of text. This app represents that amount with "slots".
+
+One slot is equal to approximately 250 characters of text. Each watch can store:
+
+* Core watches with relatively recent firmware - 255 slots
+* Classic watches - 15 slots
+  
+Text Sync will only transfer first X slots to the watch. For example, if your watch can store 15 slots and you have 1 large text file that takes up 14 slots, another that takes up 2 slots and another that takes up 1 slot,
+Text Sync will only sync the first file and the half of the second file. Third one will not be synced.
+
+You can use "Max slots" slider in the details of every file to trim the file length, so that it will only take up a specified number of slots.
+
 # Contributing
 
 See [CONTRIBUTING](CONTRIBUTING.MD)
