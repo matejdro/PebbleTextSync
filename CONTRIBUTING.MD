@@ -82,7 +82,7 @@ To create screenshot tests for your compose screen:
       `@ShowkaseComposable(group = "Test", tags = ["animated"])`
     * If you want to control the duration of the recorded animation you can add `duration-[MS]` tag, for example `duration-2000`
       will record for 2 000 milliseconds.
-4. That's it. Screenshots will be generated automatically on the CI
+4. Run `./gradlew recordPaparazziDebug`
 
 # Updating screenshot tests
 
