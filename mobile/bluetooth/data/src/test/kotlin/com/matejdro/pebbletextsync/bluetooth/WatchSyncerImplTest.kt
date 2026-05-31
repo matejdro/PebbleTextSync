@@ -81,7 +81,7 @@ class WatchSyncerImplTest {
       standardInit()
 
       fileRepo.insert(
-         SyncingFile("Title", "content://2"),
+         SyncingFile("Title", "content://2", slots = 1),
       )
       watchSyncer.syncFile(1)
       delay(1.seconds)

@@ -4,7 +4,7 @@ data class SyncingFile(
    val title: String,
    val contentUri: String,
    val id: Int = 0,
-   val slots: Int = 1,
+   val slots: Int = 5,
    val orderIndex: Int = 0,
 ) {
    companion object {

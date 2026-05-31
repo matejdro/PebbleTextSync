@@ -31,7 +31,7 @@ class SyncingFileRepositoryImplTest {
       repo.getAll().first().shouldBeSuccessWithData(
          listOf(
             SyncingFile("File A", "content://files/A", orderIndex = 0, id = 1, slots = 3),
-            SyncingFile("File B", "content://files/B", orderIndex = 1, id = 2, slots = 1)
+            SyncingFile("File B", "content://files/B", orderIndex = 1, id = 2, slots = 5)
          )
       )
 

@@ -75,7 +75,7 @@ class FileListViewModelTest {
          FileListState(
             listOf(
                SyncingFile("File A", "content://files/A", orderIndex = 0, id = 1, slots = 3),
-               SyncingFile("File B", "content://files/B", orderIndex = 1, id = 2, slots = 1)
+               SyncingFile("File B", "content://files/B", orderIndex = 1, id = 2, slots = 5)
             ),
             syncing = false
          )
@@ -110,7 +110,7 @@ class FileListViewModelTest {
       viewModel.uiState.first().shouldBeSuccessWithData(
          FileListState(
             listOf(
-               SyncingFile("File B", "content://files/B", orderIndex = 0, id = 2, slots = 1),
+               SyncingFile("File B", "content://files/B", orderIndex = 0, id = 2, slots = 5),
                SyncingFile("File A", "content://files/A", orderIndex = 1, id = 1, slots = 3),
             ),
             syncing = false,
