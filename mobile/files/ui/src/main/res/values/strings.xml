@@ -4,7 +4,7 @@
     <string name="delete">Delete</string>
     <string name="what_is_that">What is that?</string>
     <string name="name">Name</string>
-    <string name="slots">Slots</string>
+    <string name="slots">Max slots</string>
     <string name="missing_text_file">That text file does not exist anymore</string>
     <string name="refreshing_file_contents">Refreshing file contents</string>
 </resources>

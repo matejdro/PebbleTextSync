@@ -1,5 +1,6 @@
 package com.matejdro.pebbletextsync.files.ui.details
 
+import android.content.Intent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
@@ -26,9 +27,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import com.matejdro.pebbletextsync.files.SyncingFile
 import com.matejdro.pebbletextsync.files.ui.FileDetailsScreenKey
@@ -50,6 +53,7 @@ class FileDetailsScreen(
    @Composable
    override fun Content(key: FileDetailsScreenKey) {
       val stateOutcome = viewModel.uiState.collectAsStateWithLifecycleAndBlinkingPrevention()
+      val context = LocalContext.current
 
       ProgressErrorSuccessScaffold(
          stateOutcome::value,
@@ -58,7 +62,14 @@ class FileDetailsScreen(
       ) { state ->
          FileDetailsScreenContent(
             state,
-            openSlotsInfo = {},
+            openSlotsInfo = {
+               context.startActivity(
+                  Intent(
+                     Intent.ACTION_VIEW,
+                     "https://github.com/matejdro/PebbleTextSync#slots".toUri()
+                  )
+               )
+            },
             editName = viewModel::updateName,
             editSlots = viewModel::updateSlots,
             delete = viewModel::delete,
