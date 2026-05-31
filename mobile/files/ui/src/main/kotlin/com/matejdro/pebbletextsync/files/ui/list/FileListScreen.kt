@@ -121,10 +121,10 @@ private fun FileListScreenContent(
                      Text(
                         file.title,
                         modifier
+                           .clickable(onClick = { openDetails(file.id) })
                            .padding(32.dp)
                            .fillMaxWidth()
                            .animateItem()
-                           .clickable(onClick = { openDetails(file.id) })
                      )
                   }
                }
