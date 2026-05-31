@@ -263,8 +263,8 @@ jobs:
         with:
           name: release-artifacts
           path: |
-            mobile/app/build/outputs/apk/release/text-sync-mobile-$VERSION.apk
-            watch/build/textsync-watchapp-$VERSION.pbw
+            mobile/app/build/outputs/apk/release/text-sync-mobile-${{ env.VERSION }}.apk
+            watch/build/textsync-watchapp-${{ env.VERSION }}.pbw
       - name: Create a Release
         uses: ncipollo/release-action@339a81892b84b4eeb0f6e744e4574d79d0d9b8dd # v1.21.0
         env:
@@ -273,5 +273,5 @@ jobs:
           name: ${{ env.VERSION }}
           tag: ${{ env.VERSION }}
           body: ${{ steps.changelog.outputs.changelog }}${{env.CHANGELOG_EXTRA}}
-          artifacts: "mobile/app/build/outputs/apk/release/text-sync-mobile-$VERSION.apk,watch/build/textsync-watchapp-$VERSION.pbw"
+          artifacts: "mobile/app/build/outputs/apk/release/text-sync-mobile-${{ env.VERSION }}.apk,watch/build/textsync-watchapp-${{ env.VERSION }}.pbw"
           generateReleaseNotes: false
