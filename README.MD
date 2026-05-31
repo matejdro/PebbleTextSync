@@ -8,7 +8,14 @@ An app for syncing and displaying your text/markdown files on the watch
 
 **Note: the old Pebble app is not supported. You have to use either the microPebble or the new Pebble/Core app.**
 
-WIP
+## Android app
+
+[<img src="docs/badge_obtainium.png" alt="Get it on Obtainium">](https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/matejdro/PebbleTextSync)
+[<img src="docs/badge_github.png" alt="Get it on GitHub">](../../releases/latest)
+
+## Watchapp
+[<img src="docs/badge_github.png" alt="Get it on GitHub">](../../releases/latest)
+
 
 # Features
 
