@@ -2,6 +2,8 @@
 
 An app for syncing and displaying your text/markdown files on the watch
 
+![Image](docs/screenshots/list-large.png) ![Image](docs/screenshots/text-large.png)
+
 # Install
 
 **Note: the old Pebble app is not supported. You have to use either the microPebble or the new Pebble/Core app.**
