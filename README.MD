@@ -43,7 +43,9 @@ Sync automatically in the background via [Tasker](https://tasker.joaoapps.com/) 
 On the text screen:
 
 * Single click / hold DOWN - Scroll text down
+* Double click DOWN - Scroll to the bottom
 * Single click / hold UP - Scroll text up
+* Double click UP - Scroll to the top
 
 ## On the phone
 

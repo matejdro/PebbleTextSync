@@ -3,9 +3,11 @@
 #include "commons/connection/bucket_sync.h"
 #include "commons/structures/vec.h"
 #include "layers/status_bar.h"
+#include "commons/math.h"
 
 // 20 slots (max) with approx max bucket size
 #define MAX_TEXT_LENGTH (20 * PERSIST_DATA_MAX_LENGTH)
+const int32_t SINGLE_SCROLL_HEIGHT = 48;
 
 static ScrollLayer* scroll_layer;
 static TextLayer* text_layer;
@@ -36,6 +38,68 @@ static void on_bucket_changed(BucketMetadata bucket, void* context)
     }
 }
 
+// ReSharper disable once CppParameterMayBeConst
+static void button_up_single(ClickRecognizerRef recognizer, void* context)
+{
+    const int16_t current_position = scroll_layer_get_content_offset(scroll_layer).y;
+
+    scroll_layer_set_content_offset(scroll_layer, GPoint(0, MIN(0, current_position + SINGLE_SCROLL_HEIGHT)), true);
+}
+
+// ReSharper disable once CppParameterMayBeConst
+static void button_down_single(ClickRecognizerRef recognizer, void* context)
+{
+    const int16_t current_position = scroll_layer_get_content_offset(scroll_layer).y;
+    const int16_t max_scroll = scroll_layer_get_content_size(scroll_layer).h -
+        layer_get_bounds(scroll_layer_get_layer(scroll_layer)).size.h;
+
+    scroll_layer_set_content_offset(scroll_layer, GPoint(0, MAX(-max_scroll, current_position - SINGLE_SCROLL_HEIGHT)), true);
+}
+
+static void button_up_repeating(const ClickRecognizerRef recognizer, void* context)
+{
+    if (click_recognizer_is_repeating(recognizer))
+    {
+        button_up_single(recognizer, context);
+    }
+}
+
+static void button_down_repeating(const ClickRecognizerRef recognizer, void* context)
+{
+    if (click_recognizer_is_repeating(recognizer))
+    {
+        button_down_single(recognizer, context);
+    }
+}
+
+static void button_up_double(const ClickRecognizerRef recognizer, void* context)
+{
+    scroll_layer_set_content_offset(scroll_layer, GPoint(0, 0), true);
+}
+
+static void button_down_double(const ClickRecognizerRef recognizer, void* context)
+{
+    const int16_t max_scroll = scroll_layer_get_content_size(scroll_layer).h -
+        layer_get_bounds(scroll_layer_get_layer(scroll_layer)).size.h;
+
+    scroll_layer_set_content_offset(scroll_layer, GPoint(0, -max_scroll), true);
+}
+
+static void window_text_buttons_config()
+{
+    window_multi_click_subscribe(BUTTON_ID_UP, 2, 2, 150, false, button_up_double);
+    window_multi_click_subscribe(BUTTON_ID_DOWN, 2, 2, 150, false, button_down_double);
+
+    window_single_repeating_click_subscribe(BUTTON_ID_UP, 100, button_up_repeating);
+    window_single_repeating_click_subscribe(BUTTON_ID_DOWN, 100, button_down_repeating);
+
+    // regular button single click action is delayed since the watch is waiting to determine whether we hold the button
+    // or not. This is not necessary in our case, so we can just use "button down" event instead
+    window_raw_click_subscribe(BUTTON_ID_UP, button_up_single, NULL, NULL);
+    window_raw_click_subscribe(BUTTON_ID_DOWN, button_down_single, NULL, NULL);
+}
+
+
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
 static void window_load(Window* window)
 {
@@ -53,7 +117,7 @@ static void window_load(Window* window)
         )
     );
 
-    scroll_layer_set_click_config_onto_window(scroll_layer, window);
+    window_set_click_config_provider(window, window_text_buttons_config);
 
     text_layer = text_layer_create(GRect(3, 0, screen_bounds.size.w - 3, 10000));
     text_layer_set_font(text_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18));
