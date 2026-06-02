@@ -61,7 +61,7 @@ The watch can only store a limited amount of text. This app represents that amou
 
 One slot is equal to approximately 250 characters of text. Each watch can store:
 
-* Core watches with relatively recent firmware - 255 slots
+* Core watches with relatively recent firmware - 127 slots
 * Classic watches - 15 slots
   
 Text Sync will only transfer first X slots to the watch. For example, if your watch can store 15 slots and you have 1 large text file that takes up 14 slots, another that takes up 2 slots and another that takes up 1 slot,

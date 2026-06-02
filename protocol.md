@@ -67,8 +67,8 @@ Sent from the watch when the app is opened.
 
 # Buckets
 
-Watch can store up to 15 of them, up to 255 bytes each.    
-Every bucket is stored in the `2001` - `2015` storage keys.
+Watch can store up to 127 of them, up to 255 bytes each.    
+Every bucket is stored in the `2001` - `2127` storage keys.
 
 ## First file packet
 
@@ -87,3 +87,22 @@ Packet that contains extra text of a file. Its recognised by having `0x1` flag s
 Bucket data:
 * ID of the next bucket that contains more text, or 0 (uint8)
 * text (string, up to 254 bytes). No null terminator (end of bucket functions as the end of string)
+* 
+# Non-bucket storage on the watch
+
+160 bytes left over from buckets
+
+# Non-bucket storage on the watch
+
+`1000` - List of all buckets on the watch (up to 254 bytes)    
+* array of tuples (up to 127 items)
+* array size determined through `persist_get_size()`
+* Tuple: (2 bytes each)
+  * Bucket id (uint8)
+  * Flags (uint8)
+
+`1001` - Current version of the data on the watch (uint16)
+`1002` - Protocol version of the last data writing on the watch (uint16)
+  If this changes, the watch is wiped and re-synced to the phone
+
+`3000` - Set font (uint8)
