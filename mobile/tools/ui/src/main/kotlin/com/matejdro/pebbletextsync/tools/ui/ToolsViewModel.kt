@@ -4,6 +4,9 @@ import android.content.Context
 import android.net.Uri
 import androidx.compose.runtime.Stable
 import androidx.core.content.FileProvider
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
 import com.matejdro.pebble.common.logging.FileLoggingController
 import com.matejdro.pebbletextsync.common.logging.ActionLogger
 import com.matejdro.tools.ui.ToolsScreenKey
@@ -11,6 +14,7 @@ import dev.zacsweers.metro.Inject
 import dispatch.core.withDefault
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import si.inova.kotlinova.core.outcome.CoroutineResourceManager
 import si.inova.kotlinova.core.outcome.Outcome
 import si.inova.kotlinova.navigation.services.ContributesScopedService
@@ -29,6 +33,7 @@ class ToolsViewModel(
    private val actionLogger: ActionLogger,
    private val context: Context,
    private val fileLoggingController: FileLoggingController,
+   private val preferencesStore: DataStore<Preferences>,
 ) : SingleScreenViewModel<ToolsScreenKey>(resources.scope) {
    private val _uiState = MutableStateFlow<Outcome<ToolsState>>(Outcome.Progress())
    val appVersion: StateFlow<Outcome<ToolsState>>
@@ -44,8 +49,10 @@ class ToolsViewModel(
       val versionName = pInfo.versionName.orEmpty()
 
       resources.launchResourceControlTask(_uiState) {
-         emit(
-            Outcome.Success(ToolsState(versionName))
+         emitAll(
+            preferencesStore.data.map { preferences ->
+               Outcome.Success(ToolsState(versionName, preferences))
+            }
          )
       }
    }
@@ -69,6 +76,13 @@ class ToolsViewModel(
       }
 
       emit(Outcome.Success(zipUri))
+   }
+
+   fun <T> updatePreference(key: Preferences.Key<T>, value: T) = resources.launchWithExceptionReporting {
+      actionLogger.logAction { "ToolsViewModel.updatePreference($key)" }
+      preferencesStore.edit { preferences ->
+         preferences[key] = value
+      }
    }
 
    private fun ZipOutputStream.addAllLogsToZip(logFolder: File, logsZipFile: File) {
@@ -99,6 +113,7 @@ class ToolsViewModel(
 
 data class ToolsState(
    val versionName: String,
+   val preferences: Preferences,
 )
 
 private const val ZIP_BUFFER_SIZE = 1024

@@ -1,11 +1,16 @@
 package com.matejdro.pebbletextsync.bluetooth
 
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.emptyPreferences
 import com.matejdro.bucketsync.BucketSyncWatchLoopImpl
 import com.matejdro.bucketsync.FakeBucketSyncRepository
+import com.matejdro.bucketsync.InMemoryDataStore
 import com.matejdro.bucketsync.background.FakeBackgroundSyncNotifier
 import com.matejdro.pebble.bluetooth.common.PacketQueue
 import com.matejdro.pebble.bluetooth.common.test.FakePebbleSender
 import com.matejdro.pebble.bluetooth.common.test.sentData
+import com.matejdro.tools.PebbleFont
+import com.matejdro.tools.PreferenceKeys
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.maps.shouldContainKey
 import io.kotest.matchers.shouldBe
@@ -33,6 +38,8 @@ class WatchappConnectionImplTest {
 
    private val pebbleInfoRetriever = FakePebbleInfoRetriever()
 
+   private val preferences = InMemoryDataStore(emptyPreferences())
+
    private val bucketSyncWatchLoop = BucketSyncWatchLoopImpl(
       scope.backgroundScope,
       packetQueue,
@@ -49,6 +56,7 @@ class WatchappConnectionImplTest {
       watchappOpenController,
       pebbleInfoRetriever,
       watch,
+      preferences,
    )
 
    @Test
@@ -90,7 +98,7 @@ class WatchappConnectionImplTest {
       bucketSyncRepository.updateBucket(1u, byteArrayOf(1))
       bucketSyncRepository.updateBucket(2u, byteArrayOf(2))
 
-      val result = receiveStandardHelloPacket(bufferSize = 38u)
+      val result = receiveStandardHelloPacket(bufferSize = 46u)
       runCurrent()
 
       result shouldBe ReceiveResult.Ack
@@ -109,6 +117,7 @@ class WatchappConnectionImplTest {
                   1, 1, 1, // Sync data for bucket 1
                )
             ),
+            4u to PebbleDictionaryItem.UInt8(PebbleFont.GOTHIC_18.ordinal),
          ),
          mapOf(
             0u to PebbleDictionaryItem.UInt8(3u),
@@ -232,6 +241,23 @@ class WatchappConnectionImplTest {
       runCurrent()
 
       bucketSyncWatchLoop.lastMaxActiveBuckets shouldBe 255
+   }
+
+   @Test
+   fun `Send a different font when config changes`() = scope.runTest {
+      preferences.edit { prefs ->
+         prefs[PreferenceKeys.TEXT_FONT] = PebbleFont.BITHAM_30_BLACK.name
+      }
+
+      bucketSyncRepository.updateBucket(1u, byteArrayOf(1))
+      bucketSyncRepository.updateBucket(2u, byteArrayOf(2))
+
+      val result = receiveStandardHelloPacket(bufferSize = 38u)
+      runCurrent()
+
+      result shouldBe ReceiveResult.Ack
+
+      sender.sentData.first().get(4u) shouldBe PebbleDictionaryItem.UInt8(PebbleFont.BITHAM_30_BLACK.ordinal)
    }
 
    private suspend fun receiveStandardHelloPacket(

@@ -4,6 +4,7 @@
 #include <pebble.h>
 
 #include "../ui/window_status.h"
+#include "data/config.h"
 
 static void receive_phone_welcome(const DictionaryIterator* iterator);
 static void receive_sync_restart(const DictionaryIterator* iterator);
@@ -75,6 +76,12 @@ void receive_phone_welcome(const DictionaryIterator* iterator)
             window_status_show_error("Version mismatch\n\nPlease update phone app");
         }
         return;
+    }
+
+    Tuple* font_entry = dict_find(iterator, 4);
+    if (font_entry != NULL)
+    {
+        config_update_text_font(font_entry->value->uint8);
     }
 
     // ReSharper disable once CppLocalVariableMayBeConst

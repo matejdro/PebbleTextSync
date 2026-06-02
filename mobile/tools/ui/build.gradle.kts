@@ -22,6 +22,8 @@ dependencies {
    implementation(projects.logging.api)
    implementation(projects.tools.api)
    implementation(libs.androidx.core)
+   implementation(libs.androidx.datastore.preferences)
+   implementation(libs.composePreference)
    implementation(libs.dispatch)
    implementation(libs.kotlin.coroutines)
    implementation(libs.kotlinova.core)

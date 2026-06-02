@@ -1,5 +1,7 @@
 package com.matejdro.pebbletextsync.bluetooth
 
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import com.matejdro.bucketsync.BucketSyncRepository.Companion.MAX_BUCKETS_CORE_WATCHES
 import com.matejdro.bucketsync.BucketSyncRepository.Companion.MAX_BUCKETS_LEGACY_WATCHES
 import com.matejdro.bucketsync.BucketSyncWatchLoop
@@ -9,6 +11,8 @@ import com.matejdro.pebble.bluetooth.common.WatchAppConnection
 import com.matejdro.pebble.bluetooth.common.di.WatchappConnectionGraph
 import com.matejdro.pebble.bluetooth.common.di.WatchappConnectionScope
 import com.matejdro.pebble.bluetooth.common.util.requireUint
+import com.matejdro.tools.PebbleFont
+import com.matejdro.tools.PreferenceKeys
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.Inject
@@ -33,6 +37,7 @@ class WatchappConnectionImpl(
    private val openController: BucketSyncWatchappOpenController,
    private val pebbleInfoRetriever: PebbleInfoRetriever,
    private val watch: WatchIdentifier,
+   private val preferenceDatastore: DataStore<Preferences>,
 ) : WatchAppConnection {
 
    init {
@@ -79,11 +84,15 @@ class WatchappConnectionImpl(
 
       logcat { "Watch data: version=$watchVersion, buffer size=$watchBufferSize" }
 
+      val selectedFont = preferenceDatastore.data.first()[PreferenceKeys.TEXT_FONT]?.let { enumValueOf<PebbleFont>(it) }
+         ?: PreferenceKeys.TEXT_FONT_DEFAULT
+
       bucketSyncWatchLoop.sendFirstPacketAndStartLoop(
          mapOfNotNull(
             0u to PebbleDictionaryItem.UInt8(1u),
             1u to PebbleDictionaryItem.UInt16(PROTOCOL_VERSION),
             (3u to PebbleDictionaryItem.UInt8(1u)).takeIf { openController.isNextWatchappOpenForAutoSync() },
+            4u to PebbleDictionaryItem.UInt8(selectedFont.ordinal)
          ),
          watchVersion,
          watchBufferSize,

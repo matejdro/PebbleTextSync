@@ -4,6 +4,7 @@
 #include "commons/structures/vec.h"
 #include "layers/status_bar.h"
 #include "commons/math.h"
+#include "data/config.h"
 
 // 20 slots (max) with approx max bucket size
 #define MAX_TEXT_LENGTH (20 * PERSIST_DATA_MAX_LENGTH)
@@ -120,7 +121,7 @@ static void window_load(Window* window)
     window_set_click_config_provider(window, window_text_buttons_config);
 
     text_layer = text_layer_create(GRect(3, 0, screen_bounds.size.w - 3, 10000));
-    text_layer_set_font(text_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18));
+    text_layer_set_font(text_layer, config_get_text_font());
     scroll_layer_add_child(scroll_layer, text_layer_get_layer(text_layer));
 
     layer_add_child(window_layer, status_bar_layer->layer);
