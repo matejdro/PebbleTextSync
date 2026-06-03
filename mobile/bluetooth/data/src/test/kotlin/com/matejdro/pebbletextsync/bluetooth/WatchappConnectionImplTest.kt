@@ -211,7 +211,7 @@ class WatchappConnectionImplTest {
    }
 
    @Test
-   fun `Report max buckets as 255 on core watches with the new firmware`() = scope.runTest {
+   fun `Report max buckets as 127 on core watches with the new firmware`() = scope.runTest {
       pebbleInfoRetriever.setConnectedWatches(
          listOf(
             ConnectedWatch(
@@ -240,7 +240,7 @@ class WatchappConnectionImplTest {
       receiveStandardHelloPacket(bufferSize = 38u)
       runCurrent()
 
-      bucketSyncWatchLoop.lastMaxActiveBuckets shouldBe 255
+      bucketSyncWatchLoop.lastMaxActiveBuckets shouldBe 127
    }
 
    @Test
