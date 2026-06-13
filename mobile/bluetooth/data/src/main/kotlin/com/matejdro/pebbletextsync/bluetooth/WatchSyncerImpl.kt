@@ -4,6 +4,7 @@ import androidx.core.net.toUri
 import com.matejdro.bucketsync.BucketSyncRepository
 import com.matejdro.pebble.bluetooth.common.util.LimitingStringEncoder
 import com.matejdro.pebble.bluetooth.common.util.fixPebbleIndentation
+import com.matejdro.pebble.bluetooth.common.util.trimLastInvalidUtf8Character
 import com.matejdro.pebbletextsync.bluetooth.util.FileContentsReader
 import com.matejdro.pebbletextsync.files.SyncingFile
 import com.matejdro.pebbletextsync.files.SyncingFileRepository
@@ -61,6 +62,8 @@ class WatchSyncerImpl(
 
       byteBuffer.position(encodedTitle.size + 1)
       val firstBucketResult = utf8Encoder.encode(contentBuffer, byteBuffer, true)
+      byteBuffer.trimLastInvalidUtf8Character(contentBuffer)
+
       val firstBucketTextBody = byteBuffer.array().copyOfRange(fromIndex = encodedTitle.size + 1, toIndex = byteBuffer.position())
 
       val extraTextBodies = getExtraTextBodies(firstBucketResult, byteBuffer, fileMetadata, contentBuffer)
@@ -124,14 +127,16 @@ class WatchSyncerImpl(
       firstBucketResult: CoderResult,
       byteBuffer: ByteBuffer,
       fileMetadata: SyncingFile,
-      contentBuffer: CharBuffer?,
+      contentBuffer: CharBuffer,
    ): List<ByteArray> = buildList {
       if (!firstBucketResult.isUnderflow) {
          byteBuffer.rewind()
 
          var bucketsLeft = fileMetadata.slots
          while (--bucketsLeft > 0) {
+            utf8Encoder.reset()
             val result = utf8Encoder.encode(contentBuffer, byteBuffer, true)
+            byteBuffer.trimLastInvalidUtf8Character(contentBuffer)
             add(byteBuffer.array().copyOfRange(fromIndex = 0, toIndex = byteBuffer.position()))
             if (result.isUnderflow) {
                break

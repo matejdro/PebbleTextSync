@@ -4,6 +4,10 @@ plugins {
    unmock
 }
 
+custom {
+   enableEmulatorTests = true
+}
+
 dependencies {
    api(projects.bluetooth.api)
 
@@ -24,4 +28,11 @@ dependencies {
    testImplementation(projects.bucketsync.data)
    testImplementation(projects.bucketsync.test)
    testImplementation(libs.kotlinova.core.test)
+   androidTestImplementation(testFixtures(projects.files.api))
+   androidTestImplementation(projects.bucketsync.test)
+   androidTestImplementation(libs.androidx.test.runner)
+   androidTestImplementation(libs.androidx.test.core)
+   androidTestImplementation(libs.kotlin.coroutines.test)
+   androidTestImplementation(libs.kotlinova.core.test)
+   androidTestImplementation(libs.junit4)
 }
