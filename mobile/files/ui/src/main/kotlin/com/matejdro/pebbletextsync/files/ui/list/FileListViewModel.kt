@@ -9,6 +9,7 @@ import com.matejdro.pebbletextsync.files.SyncingFile
 import com.matejdro.pebbletextsync.files.SyncingFileRepository
 import com.matejdro.pebbletextsync.files.ui.FileDetailsScreenKey
 import com.matejdro.pebbletextsync.files.ui.FileListScreenKey
+import com.matejdro.pebbletextsync.files.ui.errors.UnreliableStorageWarningScreenKey
 import com.matejdro.pebbletextsync.files.ui.list.util.FileOpenPreprocessor
 import com.matejdro.pebbletextsync.navigation.instructions.OpenScreenOrReplaceExistingType
 import dev.zacsweers.metro.Inject
@@ -20,6 +21,7 @@ import kotlinx.coroutines.flow.combine
 import si.inova.kotlinova.core.outcome.CoroutineResourceManager
 import si.inova.kotlinova.core.outcome.Outcome
 import si.inova.kotlinova.core.outcome.mapData
+import si.inova.kotlinova.navigation.instructions.navigateTo
 import si.inova.kotlinova.navigation.navigator.Navigator
 import si.inova.kotlinova.navigation.services.ContributesScopedService
 import si.inova.kotlinova.navigation.services.SingleScreenViewModel
@@ -57,17 +59,21 @@ class FileListViewModel(
    fun addFile(uri: Uri) = resources.launchWithExceptionReporting {
       actionLogger.logAction { "FileListViewModel.addFile($uri)" }
 
-      val addedFileId = withDefault {
-         val fileName = fileOpenPreprocessor.resolvePermissionsAndGetFileName(uri)
+      withDefault {
+         val fileProperties = fileOpenPreprocessor.resolvePermissionsAndGetFileName(uri)
          val limitedFileName = String(
             LimitingStringEncoder()
-               .encodeSizeLimited(fileName, SyncingFile.MAX_TITLE_LENGTH_BYTES, ellipsize = false)
+               .encodeSizeLimited(fileProperties.name, SyncingFile.MAX_TITLE_LENGTH_BYTES, ellipsize = false)
                .encodedString
          )
-         syncingFileRepository.insert(SyncingFile(title = limitedFileName, contentUri = uri.toString()))
-      }
+         val addedFileId = syncingFileRepository.insert(SyncingFile(title = limitedFileName, contentUri = uri.toString()))
 
-      navigator.navigate(OpenScreenOrReplaceExistingType(FileDetailsScreenKey(addedFileId)))
+         navigator.navigate(OpenScreenOrReplaceExistingType(FileDetailsScreenKey(addedFileId)))
+
+         if (fileProperties.isFromUnreliableStorage) {
+            navigator.navigateTo(UnreliableStorageWarningScreenKey)
+         }
+      }
    }
 
    fun reorder(id: Int, toIndex: Int = -1) = resources.launchWithExceptionReporting {

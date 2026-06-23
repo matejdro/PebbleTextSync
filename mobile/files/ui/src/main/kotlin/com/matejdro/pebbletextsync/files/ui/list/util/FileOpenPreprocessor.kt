@@ -11,7 +11,7 @@ import dev.zacsweers.metro.ContributesBinding
 class FileOpenPreprocessorImpl(
    private val context: Context,
 ) : FileOpenPreprocessor {
-   override fun resolvePermissionsAndGetFileName(uri: Uri): String {
+   override fun resolvePermissionsAndGetFileName(uri: Uri): FileProperties {
       val contentResolver = context.contentResolver
       contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
@@ -19,11 +19,21 @@ class FileOpenPreprocessorImpl(
       return contentResolver.query(uri, projection, null, null, null).use { cursor ->
          if (cursor?.moveToFirst() != true) error("Unknown URI: $uri")
 
-         cursor.getString(0).substringBeforeLast(".")
+         val name = cursor.getString(0).substringBeforeLast(".")
+
+         FileProperties(
+            name,
+            uri.host != "com.android.externalstorage.documents"
+         )
       }
    }
 }
 
 fun interface FileOpenPreprocessor {
-   fun resolvePermissionsAndGetFileName(uri: Uri): String
+   fun resolvePermissionsAndGetFileName(uri: Uri): FileProperties
 }
+
+data class FileProperties(
+   val name: String,
+   val isFromUnreliableStorage: Boolean,
+)

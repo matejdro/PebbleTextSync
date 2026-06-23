@@ -4,9 +4,11 @@ import androidx.core.net.toUri
 import com.matejdro.pebbletextsync.bluetooth.FakeWatchSyncer
 import com.matejdro.pebbletextsync.files.FakeSyncingFileRepository
 import com.matejdro.pebbletextsync.files.SyncingFile
+import com.matejdro.pebbletextsync.files.ui.errors.UnreliableStorageWarningScreenKey
 import com.matejdro.pebbletextsync.files.ui.list.FileListState
 import com.matejdro.pebbletextsync.files.ui.list.FileListViewModel
 import com.matejdro.pebbletextsync.files.ui.list.util.FileOpenPreprocessor
+import com.matejdro.pebbletextsync.files.ui.list.util.FileProperties
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.delay
@@ -28,9 +30,11 @@ class FileListViewModelTest {
       val uriString = uri.toString()
 
       if (uriString == "content://test_file") {
-         "File name"
+         FileProperties("File name", false)
+      } else if (uriString == "content://test_unreliable_file") {
+         FileProperties("File name", true)
       } else if (uriString == "content://long_file") {
-         "Looooooooooooooooooong file name"
+         FileProperties("Looooooooooooooooooong file name", false)
       } else {
          throw UnsupportedOperationException("Unknown file $uri")
       }
@@ -61,6 +65,24 @@ class FileListViewModelTest {
       )
 
       navigator.backstack.shouldContainExactly(FileListScreenKey, FileDetailsScreenKey(1))
+   }
+
+   @Test
+   fun `Add an unreliable file`() = scope.runTest {
+      viewModel.addFile("content://test_unreliable_file".toUri())
+      runCurrent()
+
+      syncingFileRepository.getAll().first().shouldBeSuccessWithData(
+         listOf(
+            SyncingFile("File name", "content://test_unreliable_file", id = 1, orderIndex = 0)
+         )
+      )
+
+      navigator.backstack.shouldContainExactly(
+         FileListScreenKey,
+         FileDetailsScreenKey(1),
+         UnreliableStorageWarningScreenKey
+      )
    }
 
    @Test

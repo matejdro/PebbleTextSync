@@ -7,4 +7,9 @@
     <string name="slots">Max slots</string>
     <string name="missing_text_file">That text file does not exist anymore</string>
     <string name="refreshing_file_contents">Refreshing file contents</string>
+    <string name="warning">Warning</string>
+    <string name="unreliable_storage_warning_description">Text Sync works best when you open a file from your phone\'s internal
+        storage.\n\nIf you instead open a file from \'Recent\', \'Document\' or any other storage type, you might experience
+        issues such as file spontaneously disappearing from the watch.
+    </string>
 </resources>
