@@ -4,6 +4,7 @@ import app.cash.sqldelight.coroutines.asFlow
 import com.matejdro.pebbletextsync.bluetooth.WatchSyncer
 import com.matejdro.pebbletextsync.files.sqldelight.generated.DbFile
 import com.matejdro.pebbletextsync.files.sqldelight.generated.DbFileQueries
+import com.matejdro.pebbletextsync.files.util.FileAccessCleaner
 import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import dispatch.core.flowOnDefault
@@ -16,6 +17,7 @@ import si.inova.kotlinova.core.outcome.Outcome
 class SyncingFileRepositoryImpl(
    private val fileQueries: DbFileQueries,
    private val watchSyncer: Lazy<WatchSyncer>,
+   private val fileAccessCleaner: FileAccessCleaner,
 ) : SyncingFileRepository {
    override fun getAll(): Flow<Outcome<List<SyncingFile>>> {
       return fileQueries.getAll().asFlow().map { query ->
@@ -69,8 +71,13 @@ class SyncingFileRepositoryImpl(
    }
 
    override suspend fun delete(id: Int) = withDefault<Unit> {
+      val file = fileQueries.getSingle(id.toLong()).executeAsOneOrNull()
+
       fileQueries.delete(id.toLong())
       watchSyncer.value.syncFile(id)
+      file?.let {
+         fileAccessCleaner.onFileDeleted(it.uri)
+      }
    }
 }
 

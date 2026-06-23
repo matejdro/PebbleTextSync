@@ -5,6 +5,7 @@ import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import com.matejdro.pebbletextsync.bluetooth.FakeWatchSyncer
 import com.matejdro.pebbletextsync.files.sqldelight.generated.Database
 import com.matejdro.pebbletextsync.files.sqldelight.generated.DbFileQueries
+import com.matejdro.pebbletextsync.files.util.FileAccessCleaner
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.flow.first
@@ -18,9 +19,13 @@ class SyncingFileRepositoryImplTest {
    private val scope = TestScopeWithDispatcherProvider()
    private val watchSyncer = FakeWatchSyncer()
 
+   private var fileAccessCleanerTriggered: String? = null
+   private val fileAccessCleaner = FileAccessCleaner { fileAccessCleanerTriggered = it }
+
    private val repo = SyncingFileRepositoryImpl(
       createTestFileQueries(),
       lazyOf(watchSyncer),
+      fileAccessCleaner,
    )
 
    @Test
@@ -75,6 +80,8 @@ class SyncingFileRepositoryImplTest {
       )
 
       watchSyncer.syncedFiles.shouldContainExactly(2)
+
+      fileAccessCleanerTriggered shouldBe "content://files/B"
    }
 
    @Test
