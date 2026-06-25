@@ -14,6 +14,7 @@ An app for syncing and displaying your text/markdown files on the watch
 [<img src="docs/badge_github.png" alt="Get it on GitHub">](../../releases/latest)
 
 ## Watchapp
+[<img src="docs/badge_rebble.svg" alt="Get it on Rebble Store">](https://apps.rebble.io/en_US/application/6a3cc9bccd52370009f40d2d)
 [<img src="docs/badge_github.png" alt="Get it on GitHub">](../../releases/latest)
 
 
