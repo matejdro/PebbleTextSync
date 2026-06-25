@@ -10,10 +10,13 @@ import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
+import okio.FileNotFoundException
 import org.junit.jupiter.api.Test
+import si.inova.kotlinova.core.test.outcomes.shouldBeSuccessWithData
 import kotlin.time.Duration.Companion.seconds
 
 class WatchSyncerImplTest {
@@ -23,6 +26,8 @@ class WatchSyncerImplTest {
       when (uri.toString()) {
          "content://1" -> "Short"
          "content://2" -> "A".repeat(1000)
+         "content://deleted" -> throw FileNotFoundException()
+         "content://lostPermission" -> throw SecurityException()
          else -> "Uri $uri not faked"
       }
    }
@@ -341,6 +346,54 @@ class WatchSyncerImplTest {
          2u,
          listOf(1u, 2u),
          listOf(Bucket(2u, ByteArray(0)), Bucket(1u, ByteArray(0)))
+      )
+   }
+
+   @Test
+   fun `Delete a file when not found`() = scope.runTest {
+      fileRepo.insert(SyncingFile("Title", "content://1"))
+      fileRepo.insert(SyncingFile("Title 2", "content://deleted"))
+      runCurrent()
+
+      val watchSyncer = WatchSyncerImpl(
+         bucketsyncRepo,
+         fileRepo,
+         fileReader,
+         {},
+      )
+
+      watchSyncer.init()
+      watchSyncer.syncAll()
+      delay(1.seconds)
+
+      fileRepo.getAll().first().shouldBeSuccessWithData(
+         listOf(
+            SyncingFile("Title", "content://1", 1),
+         )
+      )
+   }
+
+   @Test
+   fun `Delete a file when permission is lost`() = scope.runTest {
+      fileRepo.insert(SyncingFile("Title", "content://1"))
+      fileRepo.insert(SyncingFile("Title 2", "content://lostPermission"))
+      runCurrent()
+
+      val watchSyncer = WatchSyncerImpl(
+         bucketsyncRepo,
+         fileRepo,
+         fileReader,
+         {},
+      )
+
+      watchSyncer.init()
+      watchSyncer.syncAll()
+      delay(1.seconds)
+
+      fileRepo.getAll().first().shouldBeSuccessWithData(
+         listOf(
+            SyncingFile("Title", "content://1", 1),
+         )
       )
    }
 

@@ -17,6 +17,7 @@ import okio.Buffer
 import si.inova.kotlinova.core.exceptions.UnknownCauseException
 import si.inova.kotlinova.core.outcome.Outcome
 import si.inova.kotlinova.core.reporting.ErrorReporter
+import java.io.FileNotFoundException
 import java.nio.ByteBuffer
 import java.nio.CharBuffer
 import java.nio.charset.CoderResult
@@ -48,30 +49,39 @@ class WatchSyncerImpl(
       }
       val fileIdString = fileMetadata.id.toString()
 
-      val fileContents = fileReader.read(
-         fileMetadata.contentUri.toUri(),
-         fileMetadata.slots * BucketSyncRepository.MAX_BUCKET_SIZE_BYTES
-      ).fixPebbleIndentation()
+      try {
+         val fileContents = fileReader.read(
+            fileMetadata.contentUri.toUri(),
+            fileMetadata.slots * BucketSyncRepository.MAX_BUCKET_SIZE_BYTES
+         ).fixPebbleIndentation()
 
-      val encodedTitle =
-         stringEncoder.encodeSizeLimited(fileMetadata.title, SyncingFile.MAX_TITLE_LENGTH_BYTES, ellipsize = false)
-            .encodedString
+         val encodedTitle =
+            stringEncoder.encodeSizeLimited(fileMetadata.title, SyncingFile.MAX_TITLE_LENGTH_BYTES, ellipsize = false)
+               .encodedString
 
-      val contentBuffer = CharBuffer.wrap(fileContents)
-      val byteBuffer = ByteBuffer.allocate(BucketSyncRepository.MAX_BUCKET_SIZE_BYTES - 1)
+         val contentBuffer = CharBuffer.wrap(fileContents)
+         val byteBuffer = ByteBuffer.allocate(BucketSyncRepository.MAX_BUCKET_SIZE_BYTES - 1)
 
-      byteBuffer.position(encodedTitle.size + 1)
-      val firstBucketResult = utf8Encoder.encode(contentBuffer, byteBuffer, true)
-      byteBuffer.trimLastInvalidUtf8Character(contentBuffer)
+         byteBuffer.position(encodedTitle.size + 1)
+         val firstBucketResult = utf8Encoder.encode(contentBuffer, byteBuffer, true)
+         byteBuffer.trimLastInvalidUtf8Character(contentBuffer)
 
-      val firstBucketTextBody = byteBuffer.array().copyOfRange(fromIndex = encodedTitle.size + 1, toIndex = byteBuffer.position())
+         val firstBucketTextBody =
+            byteBuffer.array().copyOfRange(fromIndex = encodedTitle.size + 1, toIndex = byteBuffer.position())
 
-      val extraTextBodies = getExtraTextBodies(firstBucketResult, byteBuffer, fileMetadata, contentBuffer)
+         val extraTextBodies = getExtraTextBodies(firstBucketResult, byteBuffer, fileMetadata, contentBuffer)
 
-      val savedBuckets = saveBuckets(fileMetadata, extraTextBodies, fileIdString, encodedTitle, firstBucketTextBody)
+         val savedBuckets = saveBuckets(fileMetadata, extraTextBodies, fileIdString, encodedTitle, firstBucketTextBody)
 
-      logcat { "Written buckets $savedBuckets" }
-      bucketSyncRepository.deleteGroup(fileIdString, except = savedBuckets)
+         logcat { "Written buckets $savedBuckets" }
+         bucketSyncRepository.deleteGroup(fileIdString, except = savedBuckets)
+      } catch (ignored: FileNotFoundException) {
+         logcat { "File $id (${fileMetadata.contentUri}) not found, deleting..." }
+         fileRepository.delete(id)
+      } catch (e: SecurityException) {
+         logcat { "File $id (${fileMetadata.contentUri}) lost permission: '${e.message.orEmpty()}', deleting..." }
+         fileRepository.delete(id)
+      }
    }
 
    @Suppress("MissingUseCall") // Buffer does not need closing
