@@ -2,7 +2,7 @@
 accompanist = "0.37.3"
 android-securityLints = "1.0.4"
 androidGradleCacheFix = "3.0.3"
-androidGradlePlugin = "8.13.2"
+androidGradlePlugin = "9.3.0"
 androidx-activity-compose = "1.13.0"
 androidx-benchmark = "1.4.1"
 androidx-compose-material3 = "1.4.0"
