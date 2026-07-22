@@ -33,4 +33,7 @@ Ignore unknown issue id to allow us to configure issues in this file  that
 
     <!-- We don't even have internet permission. It's not an issue -->
     <issue id="DefaultCleartextTraffic" severity="ignore" />
+
+    <!-- We don't even have internet permission. It's not an issue -->
+    <issue id="Recycle" severity="ignore" />
 </lint>
