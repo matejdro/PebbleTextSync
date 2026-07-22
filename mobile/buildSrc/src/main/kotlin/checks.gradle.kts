@@ -3,7 +3,6 @@ import dev.detekt.gradle.Detekt
 import dev.detekt.gradle.extensions.DetektExtension
 import org.gradle.accessors.dm.LibrariesForLibs
 import si.inova.kotlinova.gradle.KotlinovaExtension
-import si.inova.kotlinova.gradle.sarifmerge.SarifMergeTask
 import util.commonAndroid
 import util.isAndroidProject
 
@@ -18,7 +17,7 @@ apply(plugin = "dev.detekt")
 
 if (isAndroidProject()) {
    commonAndroid {
-      lint {
+      lint.apply {
          lintConfig = file("$rootDir/config/android-lint.xml")
          abortOnError = true
 

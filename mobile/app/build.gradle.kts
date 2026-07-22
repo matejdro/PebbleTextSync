@@ -5,7 +5,6 @@ plugins {
    serialization
    showkase
    sqldelight
-   id("androidx.baselineprofile")
 }
 
 android {
