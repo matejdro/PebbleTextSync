@@ -185,7 +185,7 @@ static void load_text()
 
     const size_t title_length = strlen((const char*)bucket_data);
 
-    const size_t first_bucket_body_length = first_bucket_size - title_length - 1;
+    const size_t first_bucket_body_length = first_bucket_size - title_length - 2;
     uint8_t next_text_bucket = bucket_data[title_length + 1];
 
     size_t text_position = first_bucket_body_length;
