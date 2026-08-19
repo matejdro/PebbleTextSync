@@ -28,7 +28,7 @@ class FileDetailsViewModel(
    private val actionLogger: ActionLogger,
    private val syncingFileRepository: SyncingFileRepository,
    private val navigator: Navigator,
-   private val timeProvider: TimeProvider,
+   timeProvider: TimeProvider,
 ) : SingleScreenViewModel<FileDetailsScreenKey>(resources.scope) {
    private val _uiState = MutableStateFlow<Outcome<FileDetailsState>>(Outcome.Progress())
    val uiState: StateFlow<Outcome<FileDetailsState>> = _uiState
