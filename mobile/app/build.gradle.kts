@@ -161,7 +161,6 @@ dependencies {
    implementation(libs.androidx.navigation3)
    implementation(libs.androidx.navigation3)
    implementation(libs.androidx.workManager)
-   implementation(libs.coil)
    implementation(libs.dispatch)
    implementation(libs.logcat)
    implementation(libs.kermit)

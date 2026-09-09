@@ -25,7 +25,6 @@ androidx-test-services = "1.6.0"
 androidx-test-uiautomator = "2.4.0"
 androidx-startup = "1.2.0"
 androidx-workManager = "2.11.2"
-coil = "3.6.1"
 composeDnd = "0.5.0"
 composePreference = "2.2.0"
 dependencyAnalysis = "3.18.0"
@@ -102,8 +101,6 @@ androidx-test-runner = { module = "androidx.test:runner", version.ref = "android
 androidx-test-services = { module = "androidx.test.services:test-services", version.ref = "androidx-test-services" }
 androidx-test-uiautomator = { group = "androidx.test.uiautomator", name = "uiautomator", version.ref = "androidx-test-uiautomator" }
 androidx-workManager = { module = "androidx.work:work-runtime-ktx", version.ref = "androidx-workManager" }
-coil = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
-coil-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coil" }
 composeDnd = { module = "com.mohamedrejeb.dnd:compose-dnd", version.ref = "composeDnd" }
 composePreference = { module = "me.zhanghai.compose.preference:preference", version.ref = "composePreference" }
 dependencyAnalysis = { module = "com.autonomousapps:dependency-analysis-gradle-plugin", version.ref = "dependencyAnalysis" }
