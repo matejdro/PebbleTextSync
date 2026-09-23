@@ -55,7 +55,7 @@ showkase = "1.0.5"
 sqldelight = "2.3.2"
 tinylog = "2.7.0"
 turbine = "1.2.1"
-unmock-androidJar = "16-robolectric-13921718"
+unmock-androidJar = "17-robolectric-15733970"
 unmock-plugin = "0.11.0"
 
 [libraries]
