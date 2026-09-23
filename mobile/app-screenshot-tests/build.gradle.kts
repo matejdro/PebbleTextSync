@@ -11,11 +11,11 @@ android {
 
    testOptions {
       unitTests.all {
-         it.useJUnit()
-         it.reports.html.required = false
+         it.useJUnitPlatform()
 
-         it.maxParallelForks = minOf(Runtime.getRuntime().availableProcessors(), 2)
-         it.systemProperty("maxParallelForks", it.maxParallelForks)
+         val numSplits = 2 // How many TestsX classes are there
+         it.maxParallelForks = minOf(Runtime.getRuntime().availableProcessors(), numSplits)
+         it.systemProperty("numSplits", numSplits)
       }
    }
 }
@@ -59,7 +59,6 @@ dependencies {
       //         )
       //      }
    }
-   testImplementation(libs.junit4)
-   testImplementation(libs.junit4.parameterinjector)
+   testImplementation(libs.junit.params)
    testImplementation(libs.showkase)
 }
