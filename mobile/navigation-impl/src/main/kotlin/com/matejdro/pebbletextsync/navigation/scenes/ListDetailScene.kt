@@ -102,6 +102,19 @@ class ListDetailScene(
       val listEntry: NavEntry<ScreenKey>,
       val detailEntry: NavEntry<ScreenKey>?,
    )
+
+   override fun equals(other: Any?): Boolean {
+      if (this === other) return true
+      if (other !is ListDetailScene) return false
+
+      if (input != other.input) return false
+
+      return true
+   }
+
+   override fun hashCode(): Int {
+      return input.hashCode()
+   }
 }
 
 @Composable

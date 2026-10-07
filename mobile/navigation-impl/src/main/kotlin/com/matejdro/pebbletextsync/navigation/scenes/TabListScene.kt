@@ -13,7 +13,7 @@ import com.matejdro.pebbletextsync.navigation.keys.base.TabContainerKey
 import si.inova.kotlinova.navigation.navigation3.key
 import si.inova.kotlinova.navigation.screenkeys.ScreenKey
 
-class TabListScene(
+data class TabListScene(
    override val key: Any,
    override val entries: List<NavEntry<ScreenKey>>,
    override val previousEntries: List<NavEntry<ScreenKey>>,
